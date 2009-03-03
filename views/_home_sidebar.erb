@@ -1,0 +1,13 @@
+<div class="item">
+<h2>The Slimetrail</h2>
+<ul class="slimetrail">
+	<% for trail in @trails %>
+	<li><a href="<%=trail.url%>"><%=trail.body%></a>
+	<% if session[:admin] %>
+	<span class="slime_controls"><a href="/delete_trail/<%=trail.id%>">Delete</a></span>
+	<% end %>
+	</li>
+	<% end %>
+	<a class="new_trail" href="/new_trail">New Trail</a>
+</ul>
+</div>

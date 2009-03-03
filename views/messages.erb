@@ -1,0 +1,14 @@
+<% @title = "Admin" %>
+
+<h2>Admin</h2>
+<h3>Messages</h3>
+<table>
+<% for message in @messages.reverse %>
+	<tr>
+		<td><a href="mailto:<%=message.email%>"><%=message.name%></a></td>
+		<td><%=message.message%></td>
+		<% message.read=1
+		   message.save %>
+	</tr>
+<% end %>
+</table>

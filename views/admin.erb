@@ -1,0 +1,42 @@
+<% @title = "Admin" %>
+
+<% unless @messages.empty? %>
+
+<div class="new_messages">
+	<a href="/messages"><% if @messages.length==1 %>
+						<%=@messages.length %> New Message</a>
+						<% else %>
+						<%=@messages.length %> New Messages</a>
+						<% end %>
+</div>
+<% end %>
+<h2>Admin</h2>
+<h3>Blog</h3>
+<div class="section">
+	<% if @posts.empty? %>
+	<p>You have no blog posts!</p>
+	<% end %>
+	<% for post in @posts do %>
+	<div class="item">
+		<p><%=post.title %></p>
+		<a class="edit" href="/edit_post/<%=post.id%>">Edit</a>
+		<a class="delete" href="/delete_post/<%=post.id%>">Delete</a>
+	</div>
+	<% end %>
+	<a class="new_post" href="/new_post">New Post</a>
+</div>
+
+<h3>Projects</h3>
+<div class="section">
+	<% if @projects.empty? %>
+	<p>You have no projects!</p>
+	<% end %>
+	<% for project in @projects do %>
+	<div class="item">
+		<p><%=project.title %></p>
+		<a class="edit" href="/edit_project/<%=project.id%>">Edit</a>
+		<a class="delete" href="/delete_project/<%=project.id%>">Delete</a>
+	</div>
+	<% end %>
+	<a class="new_project" href="/new_project">New Project</a>
+</div>

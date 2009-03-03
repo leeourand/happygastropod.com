@@ -1,0 +1,37 @@
+<% @title = "Admin" %>
+
+<h2>Admin</h2>
+<h3>New Project</h3>
+<form action="/new_project" enctype="multipart/form-data" method="post">
+	<fieldset>
+		<label for="title">Title</label>
+		<input type="text" name="title" id="title" />
+	</fieldset>
+	<fieldset>
+		<label for="description">Description</label>
+		<textarea name="description" id="description" cols="40" rows="6"></textarea>
+	</fieldset>
+	<fieldset>
+		<label for="project_type">Type</label>
+		<select name="project_type" id="project_type">
+			<option>Web</option>
+			<option>Print</option>
+			<option>Identity</option>
+			<option>Render</option>
+		</select>
+	</fieldset>
+	<fieldset>
+		<label for="thumbnail_image">Thumbnail Image</label>
+		<input type="file" name="thumbnail_image" id="thumbnail_image" />
+		<span class="helper">309px Wide</span>
+	</fieldset>
+	<fieldset>
+		<label for="full_image">Full Image</label>
+		<input type="file" name="full_image" id="full_image" />
+	</fieldset>
+	<fieldset>
+		<label for="url">URL</label>
+		<input type="text" name="url" id="url" />
+	</fieldset>
+	<input type="image" src="/images/submit.gif" value="Create" />
+</form>
