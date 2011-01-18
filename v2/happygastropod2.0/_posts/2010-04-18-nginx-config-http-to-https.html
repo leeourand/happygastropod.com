@@ -1,0 +1,20 @@
+---
+layout: post
+title: "NGINX Config: http to https"
+---
+
+<p>
+	I’ve recently installed a self-signed certificate on my server just for the login areas for my own peace of mind. After having a rough time trying to handle the redirection from Rack itself, I opted to do this through NGINX, which turned out to be quite a bit easier. Below is a snippet of the virtual host I used:
+</p>
+
+{% highlight bash %}
+server {
+            listen   80;
+            server_name happygastropod.com;
+            rewrite ^/admin https://happygastropod.com/admin permanent;
+}
+{% endhighlight %}
+
+<p>
+	It’s pretty self explanatory. Takes a regular expression of the path you’d like to redirect, and simply redirect it off to the https alternative. Enjoy.
+</p>

@@ -1,0 +1,9 @@
+---
+layout: base
+---
+<h2>{{ page.title }}</h2>
+<h3>{{ page.date | date: "%a %B %d %Y" }}</h3>
+{{ content }}
+<div id="disqus_thread">
+	{% include disqus.html %}
+</div>
