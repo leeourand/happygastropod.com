@@ -34,7 +34,7 @@ header#masthead, section#content {
   padding: 20px; }
 
 #masthead > div {
-  margin-top: 30px; }
+  margin-top: 0px; }
 
 #masthead h2 {
   background: #2f2f2f;
@@ -54,7 +54,7 @@ header#masthead, section#content {
   width: 278px;
   height: 192px;
   text-indent: -999em;
-  background: url(logo.png) no-repeat; }
+  background: url(logo.gif) no-repeat; }
 
 nav ul {
   float: right;
