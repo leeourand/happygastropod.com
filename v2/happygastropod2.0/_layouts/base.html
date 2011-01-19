@@ -17,6 +17,7 @@
 				<h2>Taking things one step at a time since 1986.</h2>
 				<nav>
 					<ul>
+						<li><a href="/pages/archive.html">Archive</a></li>
 						<li><a href="/pages/about.html">About Me</a></li>
 						<li><a href="/">Blog</a></li>
 					</ul>
@@ -28,5 +29,16 @@
 				{{ content }}
 			</div>
 		</section>
+		<footer id="foot">
+			<div id="recent-projects">
+				{% include recent_projects.html %}
+			</div>
+			<div id="recent-posts">
+				{% include recent_posts.html %}
+			</div>
+			<div id="friends">
+				{% include friends.html %}
+			</div>				
+		</footer>
 	</body>
 </html>

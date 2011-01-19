@@ -191,12 +191,63 @@ em {
 
 ul {
 	list-style: square;
-	margin-left: 15px;
+	margin: 5px 0 5px 20px;
 }
 
 ul li {
 	margin: 5px 0;
 }
+
+footer#foot {
+	position: relative;
+	width: $width;
+	margin: 1em auto;
+	
+}
+
+footer ul {
+	list-style: none;
+	margin: 0;
+}
+
+footer ul li {
+	margin: 5px 0;
+	padding: 5px;
+	border-bottom: 1px dashed #555;
+}
+
+footer #recent-projects, #recent-posts, #friends
+{
+	width: 20%;
+	float: left;
+	font-size: 0.8em;
+	padding: 10px;
+}
+
+footer #recent-posts
+{
+	width: 51%;
+}
+
+footer h3 {
+	font-size: 1.4em;
+	color: #FFF;
+	text-shadow: #000 0 0 1px;
+	border-bottom: 1px solid #555;
+}
+
+footer a
+{
+	text-decoration: none;
+	&:link, &:visited {
+		color: #CCC;
+	}
+	&:hover, &:active {
+		color: #FFF;
+		background: #222;
+	}
+}
+
 /* PYGMENTS HIGHLIGHTS
    Thanks to Ken Collins */
 
