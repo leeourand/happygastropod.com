@@ -2,7 +2,6 @@ permalink: /:year/:month/:title
 pygments: true
 
 maruku:
-  use_div: true
   use_tex:  true
   png_dir: assets/latex
   png_url: /assets/latex/
