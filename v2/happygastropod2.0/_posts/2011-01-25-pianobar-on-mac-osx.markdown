@@ -49,7 +49,7 @@ We're getting there. I'm proud of you for making it this far. Well done.
 
 So Pianobar has a few things that you can set in a config file so that you don't have to set these each time you load the application. These are things like your Pandora username, your password, and something else we'll be talking about in the next section, the event_command. It sounds pretty complicated, but we'll get through it. I promise.
 
-So, open up your favorite text editor (unless it's TextEdit, in which case, please just leave my site), and edit <code>~/.config/pianobar</code>. You'll enter in the following lines:
+So, open up your favorite text editor (unless it's TextEdit, in which case, please just leave my site), and edit <code>~/.config/pianobar/config</code>. You'll enter in the following lines:
 
 	user = you@youraddress.com
 	password = hopefullyNot123456
@@ -73,7 +73,7 @@ Now the exciting part. We're going to write a simple little program (in Ruby) to
 
 trigger = ARGV.shift
 
-if event == 'songstart'
+if trigger == 'songstart'
   songinfo = {}
 
   STDIN.each_line { |line| songinfo.store(*line.chomp.split('=', 2))}

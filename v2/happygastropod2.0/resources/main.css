@@ -118,7 +118,7 @@ body #content h2 > a:hover {
   line-height: 1.5em;
   padding: 0.75em 0 0.75em; }
 
-div.post > p > code, div.post > pre {
+p > code, div.post > pre {
   font-face: "Courier New", Courier, monospace;
   background: #EEE;
   border: 1px solid #DDD; }
