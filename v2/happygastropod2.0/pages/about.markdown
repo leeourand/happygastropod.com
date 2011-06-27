@@ -10,7 +10,7 @@ For the curious amongst you, the site is hosted on a [Linode](http://linode.com)
 
 ###Lee Ourand### 
 
-![Portrait of Lee](/resources/portrait.jpg)This is the man that can be held responsible for this silliness. He's a Computer Science student studying at [Old Dominion University](http://odu.edu) in Norfolk, Virginia. He will be graduating this semester (May 2011). He currently works as a System Administrator / Developer for [InMotion Hosting](http://inmotionhosting.com), a California-Based web hosting company.
+![Portrait of Lee](/resources/portrait.jpg)This is the man that can be held responsible for this silliness. He's a Computer Science student studying at [Old Dominion University](http://odu.edu) in Norfolk, Virginia. He will be graduating this semester (May 2011). He currently works as a System Administrator / Developer for [InMotion Hosting](http://inmotionhosting.com), a California-based web hosting company.
 
 Lee is an avid motorcyclist, having ridden and raced Motocross since the young age of 6. He began riding on the street as soon as the insurance became affordable, in order to make up for his diminishing time on the MX track. His motocross sled is a 2005 YZ250F and the street bike is a 2005 CBR600F4i. He has no aspirations of being professional or even all that good, which is a handy excuse to use when you suck.
 

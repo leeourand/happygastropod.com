@@ -11,7 +11,7 @@ So, I've been thinking how cool it would be to setup a collaborative [Boom](http
 
 #### Install Redis ####
 
-Installing Redis is really easy. At the time of writing, the latest version of Redis is 2.2.2. Redis is under somewhat heavy development, so you may want to check to see if there's a newer version. To install 2.2.2, run the following line in your teminal:
+Installing Redis is really easy. At the time of writing, the latest version of Redis is 2.2.2. Redis is under somewhat heavy development, so you may want to check to see if there's a newer version. To install 2.2.2, run the following in your teminal:
 {% highlight bash %}
 $ wget http://redis.googlecode.com/files/redis-2.2.2.tar.gz
 $ tar xvzf redis-2.2.2.tar.gz
@@ -33,7 +33,7 @@ You should get responses back from the Redis server showing that the value was s
 
 #### Installing BOOM ####
 
-Onto installing boom on your local machine. I'm going to assume you have ruby and rubygems already installed and setup. Boom, itself, has one dependency: yajl-ruby. If you don't already have this, go ahead and install it with <code>gem install yajl</code>. Once you've got yajl, a simple <code>gem install boom</code> will get you rolling with Boom. Now that you've got boom installed, run <code>boom</code> in your terminal to initialize your configuration file and your default .boom json file (we won't be using this) in this demo. Go ahead and give it a stab, and get a feel for how to use it. <code>boom help</code> will get you started. Once you're comfortable with its amazing powers of organization, let's move forward to configuring it to use Redis.
+Onto installing boom on your local machine. I'm going to assume you have ruby and rubygems already installed and setup. Boom, itself, has one dependency: yajl-ruby. If you don't already have this, go ahead and install it with <code>gem install yajl-ruby</code>. Once you've got yajl, a simple <code>gem install boom</code> will get you rolling with Boom. Now that you've got boom installed, run <code>boom</code> in your terminal to initialize your configuration file and your default .boom json file. Go ahead and give it a stab, and get a feel for how to use it. <code>boom help</code> will get you started. Once you're comfortable with its amazing powers of organization, let's move forward and configure it to use Redis.
 
 #### Configuring Boom For Redis ####
 
