@@ -1,0 +1,133 @@
+---
+layout: post
+title: Testing Nested Resources In Rails 3
+---
+
+<p>
+	Virtual Class Inheritance is something many people (myself included) have a difficult time wrapping their heads around initially. It can be a useful tool, so I’m going to try to explain it a little bit here.
+</p>
+
+<p>
+	Let’s suppose we have a Garden with different kinds of plants growing in it (how original.) We can start out by creating a very general class called Plant. With generalization in mind, we can only specify attributes and functions that all plants share.
+</p>
+
+{% highlight c++ %}
+class Plant
+{
+public:
+  virtual ~Plant();
+  virtual Plant* clone() const = 0;
+	
+  string getColor() const
+  {
+    return color;
+  }
+	
+  int getHeight() const
+  {
+    return height;
+  }
+	
+  void grow(int n)
+  {
+    height = height + n;
+  }
+	
+  virtual bool isRipe() const = 0;
+
+protected:
+  string color;
+  int height; //inches
+};
+{% endhighlight %}
+
+<p>
+	You&#8217;ll notice that the <code>isRipe()</code> function has the keyword &#8220;virtual&#8221; next to it, and it&#8217;s set to equal 0. This defines a virtual function that is not defined in the base class. There is no way of knowing whether a plant is ripe without knowing what kind of plant it is. So we will define this function in the sub-classes.
+</p>
+
+<p>
+	You should also notice that the destructor is virtual. This is because there may be additional private members in the sub classes that this base class doesn&#8217;t know about. Not declaring the destructor as virtual would likely lead to memory leaks.</p> 
+<p>We can now start coming up with plants we&#8217;d like to put in our garden. For this example, I&#8217;ve created Carrot, Potato, and Eggplant classes. Each of these classes has a unique implementation of the <code>isRipe()</code> function.
+</p>
+
+{% highlight c++ %}
+class Carrot : public Plant
+{
+public:
+  Carrot()
+  {
+    color = "Orange";
+    height = 0;
+  }
+	
+  virtual bool isRipe() const
+  {
+    return height >= 10;
+  }
+};
+ 
+class Potato : public Plant
+{
+  Potato()
+  {
+    color = "Brown";
+    height = 0;
+  }
+	
+  virtual bool isRipe() const
+  {
+    return height >= 7;
+  }
+};
+ 
+class Eggplant : public Plant
+{
+  Eggplant()
+  {
+    color = "Purple";
+    height = 0;
+  }
+	
+  virtual bool isRipe() const
+  {
+    return height >= 13;
+  }
+};
+{% endhighlight %}
+
+<p>
+	Nothing too fancy here, but you can see that each class has a different (albeit simple) way of checking if the plant is ripe.
+</p> 
+
+
+<p>
+	Moving forward, we can implement our Garden class. The Garden class is essentially a collection of plants. We&#8217;re going to store our plants in a vector. Well, really we&#8217;re storing pointers to our plants in a vector. Since there is no way of knowing how much memory each plant will use, we cannot store plants directly. We must store pointers to the plants, which could be of type potato, eggplant, or carrot.
+</p>
+
+{% highlight c++ %}
+class Garden
+{
+public:
+  Garden();
+  addPlant(Plant* p)
+  {
+    plants.push_back(p)
+  }
+	
+  harvest()
+  {
+    for(int i=0; i<fplants.size(); i++)
+    {
+      if(plants[i]->isRipe())
+      {
+        plants.delete(plants.begin() + i) //Remove ripe plants from garden
+      }
+    }
+  }
+ 
+private:
+  vector<*Plant> plants;
+};
+{% endhighlight %}
+
+<p>And there you have it. We have a very simple, and fairly useless e-garden. I&#8217;ll leave it up to you to code the army of slugs and snails to destroy it. Oh, and be sure to make a virtual class gastropod.</p> 
