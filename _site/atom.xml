@@ -4,13 +4,29 @@
  <title>HappyGastropod.com</title>
  <link href="http://happygastropod.com/atom.xml" rel="self"/>
  <link href="http://happygastropod.com/"/>
- <updated>2011-09-01T12:07:52-04:00</updated>
+ <updated>2011-09-01T12:35:27-04:00</updated>
  <id>http://happygastropod.com/</id>
  <author>
    <name>Lee Ourand</name>
    <email>lee@happygastropod.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Lessons From Highfive Tuesdays</title>
+   <link href="http://happygastropod.com/2011/08/lessons-from-highfive-tuesday"/>
+   <updated>2011-08-01T00:00:00-04:00</updated>
+   <id>http://happygastropod.com/2011/08/lessons-from-highfive-tuesday</id>
+   <content type="html">&lt;p&gt;For those of you unaware, at &lt;a href='http://inmotionhosting.com'&gt;InMotion Hosting&lt;/a&gt; we had a month of &lt;a href='http://highfivetuesdays.com'&gt;Highfive Tuesdays&lt;/a&gt;. This was a weekly competition to see who could highfive the most people. I wrote a Rails application to keep track of who highfived who, and their corresponding &amp;#8220;highfive points&amp;#8221;. At the end of the day, the winners received lame prizes (like palm tree shaped water bottles, and pez dispensers). It was a lot of fun.&lt;/p&gt;
+
+&lt;p&gt;This idea was born out of the awkward growing phase InMotion had gone through. We had turned into a middle school lunch room, where each department knew nothing of the people outside of itself. It was bad. We wanted to get people to leave their little bubbles, and meet their co-workers. Highfiving them seemed to do the trick. It worked.&lt;/p&gt;
+
+&lt;p&gt;Interestingly, the overall productivity of our support team and our system admin team &lt;em&gt;increased&lt;/em&gt; during these tuesdays. My hypothesis here is quite basic (and possibly obvious). Highfive Tuesdays made people happy. When people are happy, they are able to work better.&lt;/p&gt;
+
+&lt;p&gt;Overall, the experiment was a success. Together, over 1,000 highfives were dished out, we banished the awkward avoidance tactics in the breakroom, we demonstrated a basic concept (happy people = good workers), and we had some fun along the way.&lt;/p&gt;
+
+&lt;p&gt;If you would like to give Highfive Tuesdays a try at your office, I have open sourced the code, which you can grab &lt;a href='https://github.com/thegastropod/Highfive-Tuesdays'&gt;on my github&lt;/a&gt;. And if you need a hand deploying it, just hit me up on &lt;a href='http://twitter.com/the_gastropod'&gt;twitter&lt;/a&gt; and I&amp;#8217;ll be glad to help.&lt;/p&gt;</content>
+ </entry>
  
  <entry>
    <title>July CVREG Meetup</title>

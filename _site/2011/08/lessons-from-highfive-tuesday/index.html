@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="author" content="Lee Ourand" />
-		<title>HappyGastropod: NGINX Config: http to https</title>
+		<title>HappyGastropod: Lessons From Highfive Tuesdays</title>
 		<link rel="alternate" type="application/atom+xml" title="HappyGastropod.com" href="/atom.xml" />
 		<link rel="stylesheet" type="text/css" href="/resources/reset.css" />
 		<link rel="stylesheet" type="text/css" href="/resources/main.css" />
@@ -37,31 +37,24 @@
 		<section id="content">
 			<div>
 				<div class="post">
-	<h2>NGINX Config: http to https</h2>
-	<h3>Sun April 18 2010</h3>
-	<p>
-	I’ve recently installed a self-signed certificate on my server just for the login areas for my own peace of mind. After having a rough time trying to handle the redirection from Rack itself, I opted to do this through NGINX, which turned out to be quite a bit easier. Below is a snippet of the virtual host I used:
-</p>
+	<h2>Lessons From Highfive Tuesdays</h2>
+	<h3>Mon August 01 2011</h3>
+	<p>For those of you unaware, at <a href='http://inmotionhosting.com'>InMotion Hosting</a> we had a month of <a href='http://highfivetuesdays.com'>Highfive Tuesdays</a>. This was a weekly competition to see who could highfive the most people. I wrote a Rails application to keep track of who highfived who, and their corresponding &#8220;highfive points&#8221;. At the end of the day, the winners received lame prizes (like palm tree shaped water bottles, and pez dispensers). It was a lot of fun.</p>
 
-<div class="highlight"><pre><code class="bash">server <span class="o">{</span>
-            listen   80;
-            server_name happygastropod.com;
-            rewrite ^/admin https://happygastropod.com/admin permanent;
-<span class="o">}</span>
-</code></pre>
-</div>
+<p>This idea was born out of the awkward growing phase InMotion had gone through. We had turned into a middle school lunch room, where each department knew nothing of the people outside of itself. It was bad. We wanted to get people to leave their little bubbles, and meet their co-workers. Highfiving them seemed to do the trick. It worked.</p>
 
+<p>Interestingly, the overall productivity of our support team and our system admin team <em>increased</em> during these tuesdays. My hypothesis here is quite basic (and possibly obvious). Highfive Tuesdays made people happy. When people are happy, they are able to work better.</p>
 
-<p>
-	It’s pretty self explanatory. Takes a regular expression of the path you’d like to redirect, and simply redirect it off to the https alternative. Enjoy.
-</p>
+<p>Overall, the experiment was a success. Together, over 1,000 highfives were dished out, we banished the awkward avoidance tactics in the breakroom, we demonstrated a basic concept (happy people = good workers), and we had some fun along the way.</p>
+
+<p>If you would like to give Highfive Tuesdays a try at your office, I have open sourced the code, which you can grab <a href='https://github.com/thegastropod/Highfive-Tuesdays'>on my github</a>. And if you need a hand deploying it, just hit me up on <a href='http://twitter.com/the_gastropod'>twitter</a> and I&#8217;ll be glad to help.</p>
 	<div id="disqus_thread">
 		<script type="text/javascript">
   var disqus_developer = 1;
   var disqus_shortname = 'happygastropod';
-  var disqus_identifier = '/2010/04/nginx-config-http-to-https';
-	var disqus_url = "http://happygastropod.com/2010/04/nginx-config-http-to-https";
-  var disqus_title = 'NGINX Config: http to https';
+  var disqus_identifier = '/2011/08/lessons-from-highfive-tuesday';
+	var disqus_url = "http://happygastropod.com/2011/08/lessons-from-highfive-tuesday";
+  var disqus_title = 'Lessons From Highfive Tuesdays';
   (function() {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
       dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';

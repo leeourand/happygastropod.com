@@ -38,6 +38,20 @@
 			<div>
 				
 	<div class="post">
+		<h2><a href="/2011/08/lessons-from-highfive-tuesday">Lessons From Highfive Tuesdays</a></h2>
+		<h3>Mon August 01 2011</h3>
+		<p>For those of you unaware, at <a href='http://inmotionhosting.com'>InMotion Hosting</a> we had a month of <a href='http://highfivetuesdays.com'>Highfive Tuesdays</a>. This was a weekly competition to see who could highfive the most people. I wrote a Rails application to keep track of who highfived who, and their corresponding &#8220;highfive points&#8221;. At the end of the day, the winners received lame prizes (like palm tree shaped water bottles, and pez dispensers). It was a lot of fun.</p>
+
+<p>This idea was born out of the awkward growing phase InMotion had gone through. We had turned into a middle school lunch room, where each department knew nothing of the people outside of itself. It was bad. We wanted to get people to leave their little bubbles, and meet their co-workers. Highfiving them seemed to do the trick. It worked.</p>
+
+<p>Interestingly, the overall productivity of our support team and our system admin team <em>increased</em> during these tuesdays. My hypothesis here is quite basic (and possibly obvious). Highfive Tuesdays made people happy. When people are happy, they are able to work better.</p>
+
+<p>Overall, the experiment was a success. Together, over 1,000 highfives were dished out, we banished the awkward avoidance tactics in the breakroom, we demonstrated a basic concept (happy people = good workers), and we had some fun along the way.</p>
+
+<p>If you would like to give Highfive Tuesdays a try at your office, I have open sourced the code, which you can grab <a href='https://github.com/thegastropod/Highfive-Tuesdays'>on my github</a>. And if you need a hand deploying it, just hit me up on <a href='http://twitter.com/the_gastropod'>twitter</a> and I&#8217;ll be glad to help.</p>
+	</div>
+
+	<div class="post">
 		<h2><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></h2>
 		<h3>Sun July 10 2011</h3>
 		<p>Last night was the <a href='http://cvreg.org/http://www.cvreg.org/2011/7/9/july-summer-social'>July CVREG</a> meetup, and the <a href='http://757rb.org'>757rb</a> regulars decided to take a road trip to visit the Legend Brewery, and talk Ruby with our Richmond friends. The theme of the evening was Ruby&#8217;s role in doing freelance/contract work. They had a panel of four self-employed Rubyists who answered some questions about working with Ruby as a one-man-shop.</p>
@@ -186,64 +200,6 @@ password = hopefullyNot123456</code></pre>
 <p>Save the file, and you&#8217;re done. You can now listen to your favorite tunes through the command line, see who&#8217;s playing when new songs start, and you&#8217;re now up to speed with the latest in package management fashion for the Mac platform.</p>
 	</div>
 
-	<div class="post">
-		<h2><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></h2>
-		<h3>Thu October 21 2010</h3>
-		<p>
-	I recently ran into some problems when trying to run my functional tests while using nested resources in the new Rails 3. My routing was setup for nested resources, Foo has many Bars.
-</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">resources</span> <span class="ss">:foos</span> <span class="k">do</span>
-  <span class="n">resources</span> <span class="ss">:bars</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-
-<p>
-	I used a rather contrived test to get started.
-</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="nb">test</span> <span class="s2">&quot;that I can GET the index&quot;</span> <span class="k">do</span>
-  <span class="n">get</span> <span class="ss">:index</span>
-  <span class="n">assert_response</span> <span class="ss">:success</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-
-<p>The first error that I received, when using this fairly basic test was:</p>
-
-<code>NoMethodError: undefined method `recycle!` for #&lt;Bar:0x1033f09e0&gt;</code>
-
-<p>This error is easily corrected by renaming the fixture instance variable youre likely declaring in your setup. In my case, the Bar resource name needed to be updated.</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="n">setup</span> <span class="k">do</span>
-<span class="c1"># @bar = bars(:one) Change to:</span>
-  <span class="vi">@my_bar</span> <span class="o">=</span> <span class="n">bars</span><span class="p">(</span><span class="ss">:one</span><span class="p">)</span> 
-<span class="k">end</span>
-</code></pre>
-</div>
-
-
-<p>ActionController has its own set of instance variables named after the controller. In the commented out case above, you are squashing Rails instance variable, which causes this error.</p>
-
-<p>After correcting this issue, I was still having problems.</p>
-
-<code>ActionController::RoutingError: No route matches {:controller=&gt;"bar"}</code>
-<p>This was another really basic fix that took me longer than I care to admit to resolve. To fix this, you simply need to fix your test case to provide the parent resource id.</p>
-
-<div class="highlight"><pre><code class="ruby"><span class="nb">test</span> <span class="s2">&quot;that I can GET the index&quot;</span> <span class="k">do</span>
-  <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="ss">:foo_id</span> <span class="o">=&gt;</span> <span class="vi">@my_foo</span><span class="o">.</span><span class="n">id</span>
-  <span class="n">assert_response</span> <span class="ss">:success</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-
-<p>Note that youll also need to declare a <code>@my_foo</code> variable in your setup for this to work. Otherwise, you can just use any number to get the routing to work. Happy testing!</p>
-	</div>
-
 <a href="/pages/archive.html">View Archive</a>
 			</div>
 		</section>
@@ -262,13 +218,13 @@ password = hopefullyNot123456</code></pre>
 				<h3>Recent Posts</h3>
 <ul>
 
+	<li><a href="/2011/08/lessons-from-highfive-tuesday">Lessons From Highfive Tuesdays</a></li>
+
 	<li><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></li>
 
 	<li><a href="/2011/03/a-centralized-boom-server-using-redis">A Centralized Boom Server Using Redis</a></li>
 
 	<li><a href="/2011/01/pianobar-on-mac-osx">Pianobar On Mac OS X</a></li>
-
-	<li><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></li>
 
 </ul>
 			</div>
