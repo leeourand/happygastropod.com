@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="author" content="Lee Ourand" />
+		<title>HappyGastropod: Welcome!</title>
+		<link rel="alternate" type="application/atom+xml" title="HappyGastropod.com" href="/atom.xml" />
+		<link rel="stylesheet" type="text/css" href="/resources/reset.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/main.css" />
+		<script src="/resources/site.js"></script>
+		<script type="text/javascript">
+		        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		        </script>
+		        <script type="text/javascript">
+		        try {
+		        var pageTracker = _gat._getTracker("UA-7743776-1");
+		        pageTracker._trackPageview();
+		        } catch(err) {}</script>
+		
+		<link rel="shortcut icon" href="/favicon.png" />
+	</head>
+	<body>
+		<header id="masthead">
+			<div>
+				<h1>HappyGastropod.com</h1>
+				<h2>Taking things one step at a time since 1986.</h2>
+				<nav>
+					<ul>
+						<li><a href="/pages/archive.html">Archive</a></li>
+						<li><a href="/pages/about.html">About Me</a></li>
+						<li><a href="/">Blog</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<section id="content">
+			<div>
+				
+	<div class="post">
+		<h2><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></h2>
+		<h3>Sun July 10 2011</h3>
+		<p>Last night was the <a href='http://cvreg.org/http://www.cvreg.org/2011/7/9/july-summer-social'>July CVREG</a> meetup, and the <a href='http://757rb.org'>757rb</a> regulars decided to take a road trip to visit the Legend Brewery, and talk Ruby with our Richmond friends. The theme of the evening was Ruby&#8217;s role in doing freelance/contract work. They had a panel of four self-employed Rubyists who answered some questions about working with Ruby as a one-man-shop.</p>
+
+<p>One of the interesting questions that came up was &#8220;Is it difficult to &#8216;sell&#8217; Ruby to clients?&#8221; All of the members of the panel had experienced at least one client who was scared off by the fact that they were using Ruby. It goes to show that despite the hard work put in by so many in the Ruby community, and the so blatantly obvious golden beacons that show Ruby does scale (Github, Gowalla, all 37signals products, etc.), a few strategic &#8220;RUBY IS SLOW&#8221; statements have seriously devastated the public understanding of the language.</p>
+
+<p>Demonstrating that it works, providing benchmarks that smack down PHP, and showing that we can develop applications faster with Ruby don&#8217;t matter. The fact that Ruby is &#8220;weird&#8221; and &#8220;slow&#8221; make it a non-starter for so many. So what can we do to make Ruby more accepted?</p>
+	</div>
+
+	<div class="post">
+		<h2><a href="/2011/03/a-centralized-boom-server-using-redis">A Centralized Boom Server Using Redis</a></h2>
+		<h3>Fri March 25 2011</h3>
+		<p>So, I&#8217;ve been thinking how cool it would be to setup a collaborative <a href='http://zachholman.com/boom/'>Boom</a> database. With its recent support for Redis and MongoDB, I figured it was a good time to give this crazy idea a whirl. So, let&#8217;s run through the basic requirements to set this up. Fending off the baddies from deleting your beautiful lists is up to you, I must warn. What I&#8217;m going to explain in this example is how to do the following:</p>
+
+<ul>
+<li>Install Redis on a centralized server</li>
+
+<li>Install Boom</li>
+
+<li>Configure Boom to use the centralized server</li>
+</ul>
+
+<h4 id='install_redis'>Install Redis</h4>
+
+<p>Installing Redis is really easy. At the time of writing, the latest version of Redis is 2.2.2. Redis is under somewhat heavy development, so you may want to check to see if there&#8217;s a newer version. To install 2.2.2, run the following in your teminal:</p>
+<div class='highlight'><pre><code class='bash'><span class='nv'>$ </span>wget http://redis.googlecode.com/files/redis-2.2.2.tar.gz
+<span class='nv'>$ </span>tar xvzf redis-2.2.2.tar.gz
+<span class='nv'>$ </span><span class='nb'>cd </span>redis-2.2.2
+<span class='nv'>$ </span>make <span class='o'>&amp;&amp;</span> make install
+</code></pre>
+</div>
+<p>Now that Redis is installed, you can fire up the server with, strangely enough, <code>redis-server</code>. By default, it&#8217;s going to run the server on port 6379. If you&#8217;re running a firewall on the server you&#8217;re installing this on (you are running a firewall, aren&#8217;t you?), you will need to open up this port.</p>
+
+<p>To test that everything&#8217;s working, you can use the always handy telnet. In your command line, you can do the following:</p>
+<div class='highlight'><pre><code class='bash'><span class='nv'>$ </span>telnet &lt;hostname&gt; 6379
+&gt; SET hello thar
+&gt; GET hello
+</code></pre>
+</div>
+<p>You should get responses back from the Redis server showing that the value was stored during the <code>SET</code>, and return your &#8220;thar&#8221; when you <code>GET</code>. Redis <em>is</em> pretty cool, huh?</p>
+
+<h4 id='installing_boom'>Installing BOOM</h4>
+
+<p>Onto installing boom on your local machine. I&#8217;m going to assume you have ruby and rubygems already installed and setup. Boom, itself, has one dependency: yajl-ruby. If you don&#8217;t already have this, go ahead and install it with <code>gem install yajl-ruby</code>. Once you&#8217;ve got yajl, a simple <code>gem install boom</code> will get you rolling with Boom. Now that you&#8217;ve got boom installed, run <code>boom</code> in your terminal to initialize your configuration file and your default .boom json file. Go ahead and give it a stab, and get a feel for how to use it. <code>boom help</code> will get you started. Once you&#8217;re comfortable with its amazing powers of organization, let&#8217;s move forward and configure it to use Redis.</p>
+
+<h4 id='configuring_boom_for_redis'>Configuring Boom For Redis</h4>
+
+<p>To use Boom with our new Redis server, you&#8217;ll need to install the Redis gem: <code>gem install redis</code>. Next, you&#8217;ll need to crack open your newly created ~/.boom.conf file in your favorite text-editor, and edit it to look like this:</p>
+
+<pre><code>{
+  &quot;backend&quot;: &quot;redis&quot;,
+  &quot;redis&quot;: {
+    &quot;port&quot;: &quot;6379&quot;,
+    &quot;host&quot;: &quot;your-host-name.com&quot;
+  }
+}</code></pre>
+
+<p>You&#8217;ll obviously be swapping out the cleverly named &#8220;your-host-name.com&#8221; to whatever your hostname actually is. Once that bit of configuration is done, boom will be using your centralized redis database to store its contents. Neat! You and your friends or co-workers can now share this, and get into all sorts of mischief! Enjoy it.</p>
+
+<h4 id='where_to_go_from_here'>Where To Go From Here</h4>
+
+<p>This is obviously not an ideal setup. It&#8217;s open to anyone with an internet connection, so you may want to do IP-based verification, some kind of authentication scheme, etc. Your server is just running in your SSH session, if you stop with where I left you. You&#8217;ll likely want to setup an rc.d / init.d script to fire up the redis server for you on startup. You also will probably want some kind of data persistence, since Redis stores all data in memory (although it will periodically dump to disk).</p>
+
+<p>In all, this is a pretty neat concept. I&#8217;m not sure how well it will work with co-workers or friends, since everyone has full read/write access to everything. But for compiling lists of funny image urls, command line one-liners, canned e-mail responses, etc., you may just find that this comes in handy if everyone is cooperative.</p>
+	</div>
+
+	<div class="post">
+		<h2><a href="/2011/01/pianobar-on-mac-osx">Pianobar On Mac OS X</a></h2>
+		<h3>Tue January 25 2011</h3>
+		<p>Recently, my friend <a href='http://redkrieg.com/2011/01/02/pianobar-an-open-source-pandora-client/'>Brandon</a> wrote about using <a href='https://github.com/PromyLOPh/pianobar'>Pianobar</a> on Linux (specifically on Debian based systems). In every attempt to steal his thunder, I&#8217;m copying him, and posting about how to get the same thing working on Mac OS X with similar functionality.</p>
+
+<p>For those unfamiliar, Pianobar is a command line interface to <a href='http://pandora.com'>Pandora</a>, which is more gentle on your memory footprint (no Adobe anything!), and is easier to tuck away in the background. We&#8217;re going to do a few things in this brief tutorial:</p>
+
+<ul>
+<li>Setup homebrew if you have not already</li>
+
+<li>Install Pianobar</li>
+
+<li>Install growlnotify</li>
+
+<li>Configure Pianobar</li>
+
+<li>Setup Growl notification for Pianobar</li>
+</ul>
+
+<h4 id='installing_homebrew'>Installing Homebrew</h4>
+
+<p>Frankly, you should be ashamed of yourself if you haven&#8217;t installed homebrew yet on your mac. To put it plainly, it&#8217;s the bee&#8217;s knees. Alright, now that you&#8217;re convinced, let&#8217;s get started.</p>
+
+<p>Installation is really difficult, so be prepared for some heartache and pain. First, run this in your terminal:</p>
+<div class='highlight'><pre><code class='bash'>curl -L http://github.com/mxcl/homebrew/tarball/master | tar xz --strip 1 -C /usr/local
+</code></pre>
+</div>
+<p>AND THAT&#8217;S IT. Difficult, eh?</p>
+
+<h4 id='installing_pianobar'>Installing Pianobar</h4>
+
+<p>So now that we&#8217;ve made it through that grueling task, we can move forward and install pianobar using our favorite package manager (in case you&#8217;ve forgotten already that&#8217;s homebrew. We just installed it. Pay attention.) Run this whiz-bang command in your terminal:</p>
+<div class='highlight'><pre><code class='bash'>brew install pianobar
+</code></pre>
+</div>
+<p>BANG! You&#8217;re ready to listen to some Pandora through your terminal. You can go ahead and try it out by typing <code>pianobar</code> in your terminal. Go ahead. I&#8217;ll wait.</p>
+
+<h4 id='install_growl_notify'>Install Growl Notify</h4>
+
+<p>This probably doesn&#8217;t even merit its own step. But let&#8217;s go ahead anyways.</p>
+<div class='highlight'><pre><code class='bash'>brew install growlnotify
+</code></pre>
+</div>
+<h4 id='configure_pianobar'>Configure Pianobar</h4>
+
+<p>We&#8217;re getting there. I&#8217;m proud of you for making it this far. Well done.</p>
+
+<p>So Pianobar has a few things that you can set in a config file so that you don&#8217;t have to set these each time you load the application. These are things like your Pandora username, your password, and something else we&#8217;ll be talking about in the next section, the event_command. It sounds pretty complicated, but we&#8217;ll get through it. I promise.</p>
+
+<p>So, open up your favorite text editor (unless it&#8217;s TextEdit, in which case, please just leave my site), and edit <code>~/.config/pianobar/config</code>. You&#8217;ll enter in the following lines:</p>
+
+<pre><code>user = you@youraddress.com
+password = hopefullyNot123456</code></pre>
+
+<p>Go ahead. Give Pianobar another whirl. It should log you in automatically. Pretty fancy, huh? Onward!</p>
+
+<h4 id='setup_growl_notification'>Setup Growl Notification</h4>
+
+<p>You can obviously skip this part if you find Growl obnoxious or annoying. I happen to like it. It&#8217;s like a good friend who keeps you informed when exciting events are happening. I call him Ralph.</p>
+
+<p>So, don&#8217;t get angry, but remember that pianobar configuration file? Yea? Ok, we&#8217;re going to edit that once again. So open it up again in anything but TextEdit, and we&#8217;re going to add this line to the bottom:</p>
+
+<pre><code>event_command = /Users/yourusername/bin/pianobar-notify.rb</code></pre>
+
+<p>Obviously, you&#8217;ll want to swap out &#8220;yourusername&#8221; for your actual username. If you don&#8217;t know what it is, you can use the <code>whoami</code> command. You&#8217;re welcome.</p>
+
+<p>Now the exciting part. We&#8217;re going to write a simple little program (in Ruby) to let us know some info about new songs that are being played through Pianobar. Ok, it&#8217;s not really THAT exciting, but still pretty cool. Let&#8217;s open up our text editors for one final edit. This time we&#8217;re opening the <code>/Users/yourusername/bin/pianobar-notify.rb</code> file. Ok, now that you&#8217;ve got your file open (welcome back, by the way), you&#8217;re going to type (or you can copy/paste if you really want to) this:</p>
+<div class='highlight'><pre><code class='ruby'><span class='c1'>#!/usr/bin/ruby</span>
+
+<span class='n'>trigger</span> <span class='o'>=</span> <span class='no'>ARGV</span><span class='o'>.</span><span class='n'>shift</span>
+
+<span class='k'>if</span> <span class='n'>trigger</span> <span class='o'>==</span> <span class='s1'>&#39;songstart&#39;</span>
+  <span class='n'>songinfo</span> <span class='o'>=</span> <span class='p'>{}</span>
+
+  <span class='no'>STDIN</span><span class='o'>.</span><span class='n'>each_line</span> <span class='p'>{</span> <span class='o'>|</span><span class='n'>line</span><span class='o'>|</span> <span class='n'>songinfo</span><span class='o'>.</span><span class='n'>store</span><span class='p'>(</span><span class='o'>*</span><span class='n'>line</span><span class='o'>.</span><span class='n'>chomp</span><span class='o'>.</span><span class='n'>split</span><span class='p'>(</span><span class='s1'>&#39;=&#39;</span><span class='p'>,</span> <span class='mi'>2</span><span class='p'>))}</span>
+  <span class='sb'>`growlnotify -t &quot;Now Playing&quot; -m &quot;</span><span class='si'>#{</span><span class='n'>songinfo</span><span class='o'>[</span><span class='s1'>&#39;title&#39;</span><span class='o'>]</span><span class='si'>}</span><span class='se'>\n</span><span class='sb'>by </span><span class='si'>#{</span><span class='n'>songinfo</span><span class='o'>[</span><span class='s1'>&#39;artist&#39;</span><span class='o'>]</span><span class='si'>}</span><span class='sb'>&quot;`</span>
+<span class='k'>end</span>
+</code></pre>
+</div>
+<p>Save the file, and you&#8217;re done. You can now listen to your favorite tunes through the command line, see who&#8217;s playing when new songs start, and you&#8217;re now up to speed with the latest in package management fashion for the Mac platform.</p>
+	</div>
+
+	<div class="post">
+		<h2><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></h2>
+		<h3>Thu October 21 2010</h3>
+		<p>
+	I recently ran into some problems when trying to run my functional tests while using nested resources in the new Rails 3. My routing was setup for nested resources, Foo has many Bars.
+</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">resources</span> <span class="ss">:foos</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:bars</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>
+	I used a rather contrived test to get started.
+</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="nb">test</span> <span class="s2">&quot;that I can GET the index&quot;</span> <span class="k">do</span>
+  <span class="n">get</span> <span class="ss">:index</span>
+  <span class="n">assert_response</span> <span class="ss">:success</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>The first error that I received, when using this fairly basic test was:</p>
+
+<code>NoMethodError: undefined method `recycle!` for #&lt;Bar:0x1033f09e0&gt;</code>
+
+<p>This error is easily corrected by renaming the fixture instance variable youre likely declaring in your setup. In my case, the Bar resource name needed to be updated.</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">setup</span> <span class="k">do</span>
+<span class="c1"># @bar = bars(:one) Change to:</span>
+  <span class="vi">@my_bar</span> <span class="o">=</span> <span class="n">bars</span><span class="p">(</span><span class="ss">:one</span><span class="p">)</span> 
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>ActionController has its own set of instance variables named after the controller. In the commented out case above, you are squashing Rails instance variable, which causes this error.</p>
+
+<p>After correcting this issue, I was still having problems.</p>
+
+<code>ActionController::RoutingError: No route matches {:controller=&gt;"bar"}</code>
+<p>This was another really basic fix that took me longer than I care to admit to resolve. To fix this, you simply need to fix your test case to provide the parent resource id.</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="nb">test</span> <span class="s2">&quot;that I can GET the index&quot;</span> <span class="k">do</span>
+  <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="ss">:foo_id</span> <span class="o">=&gt;</span> <span class="vi">@my_foo</span><span class="o">.</span><span class="n">id</span>
+  <span class="n">assert_response</span> <span class="ss">:success</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>Note that youll also need to declare a <code>@my_foo</code> variable in your setup for this to work. Otherwise, you can just use any number to get the routing to work. Happy testing!</p>
+	</div>
+
+<a href="/pages/archive.html">View Archive</a>
+			</div>
+		</section>
+		<footer id="foot">
+			<div id="recent-projects">
+				<h3>Recent Projects</h3>
+<ul>
+    <li><a href="http://happygastropod.com:4567">Jook</a></li>
+	<li><a href="http://github.com/thegastropod/peanut">Peanut</a></li>
+	<li><a href="http://slu.ug">slu.ug</a></li>
+	<li><a href="http://github.com/thegastropod/brightcms">bright cms</a></li>
+</ul>
+
+			</div>
+			<div id="recent-posts">
+				<h3>Recent Posts</h3>
+<ul>
+
+	<li><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></li>
+
+	<li><a href="/2011/03/a-centralized-boom-server-using-redis">A Centralized Boom Server Using Redis</a></li>
+
+	<li><a href="/2011/01/pianobar-on-mac-osx">Pianobar On Mac OS X</a></li>
+
+	<li><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></li>
+
+</ul>
+			</div>
+			<div id="friends">
+				<h3>Friends</h3>
+<ul>
+	<li><a href="http://notesfromnicole.com">Notes From Nicole</a></li>
+	<li><a href="http://chrisrhoden.com">Chris Rhoden</a></li>
+	<li><a href="http://erikimh.com">ErikIMH</a></li>
+	<li><a href="http://redkrieg.com">RedKrieg</a></li>
+	<li><a href="http://crspeedy.com">CRSpeedy</a></li>
+	<li><a href="http://metaskills.com">MetaSkills</a></li>
+</ul>
+			</div>				
+		</footer>
+	</body>
+</html>

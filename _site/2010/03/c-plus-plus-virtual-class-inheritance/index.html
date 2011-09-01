@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="author" content="Lee Ourand" />
+		<title>HappyGastropod: C++ Virtual Class Inheritance</title>
+		<link rel="alternate" type="application/atom+xml" title="HappyGastropod.com" href="/atom.xml" />
+		<link rel="stylesheet" type="text/css" href="/resources/reset.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/main.css" />
+		<script src="/resources/site.js"></script>
+		<script type="text/javascript">
+		        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		        </script>
+		        <script type="text/javascript">
+		        try {
+		        var pageTracker = _gat._getTracker("UA-7743776-1");
+		        pageTracker._trackPageview();
+		        } catch(err) {}</script>
+		
+		<link rel="shortcut icon" href="/favicon.png" />
+	</head>
+	<body>
+		<header id="masthead">
+			<div>
+				<h1>HappyGastropod.com</h1>
+				<h2>Taking things one step at a time since 1986.</h2>
+				<nav>
+					<ul>
+						<li><a href="/pages/archive.html">Archive</a></li>
+						<li><a href="/pages/about.html">About Me</a></li>
+						<li><a href="/">Blog</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<section id="content">
+			<div>
+				<div class="post">
+	<h2>C++ Virtual Class Inheritance</h2>
+	<h3>Thu March 11 2010</h3>
+	<p>
+	Virtual Class Inheritance is something many people (myself included) have a difficult time wrapping their heads around initially. It can be a useful tool, so I’m going to try to explain it a little bit here.
+</p>
+
+<p>
+	Let’s suppose we have a Garden with different kinds of plants growing in it (how original.) We can start out by creating a very general class called Plant. With generalization in mind, we can only specify attributes and functions that all plants share.
+</p>
+
+<div class="highlight"><pre><code class="c"><span class="n">class</span> <span class="n">Plant</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Plant</span><span class="p">();</span>
+  <span class="k">virtual</span> <span class="n">Plant</span><span class="o">*</span> <span class="n">clone</span><span class="p">()</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	
+  <span class="n">string</span> <span class="n">getColor</span><span class="p">()</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">color</span><span class="p">;</span>
+  <span class="p">}</span>
+	
+  <span class="kt">int</span> <span class="n">getHeight</span><span class="p">()</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">height</span><span class="p">;</span>
+  <span class="p">}</span>
+	
+  <span class="kt">void</span> <span class="n">grow</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">height</span> <span class="o">+</span> <span class="n">n</span><span class="p">;</span>
+  <span class="p">}</span>
+	
+  <span class="k">virtual</span> <span class="n">bool</span> <span class="n">isRipe</span><span class="p">()</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="nl">protected:</span>
+  <span class="n">string</span> <span class="n">color</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">height</span><span class="p">;</span> <span class="c1">//inches</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+
+<p>
+	You&#8217;ll notice that the <code>isRipe()</code> function has the keyword &#8220;virtual&#8221; next to it, and it&#8217;s set to equal 0. This defines a virtual function that is not defined in the base class. There is no way of knowing whether a plant is ripe without knowing what kind of plant it is. So we will define this function in the sub-classes.
+</p>
+
+<p>
+	You should also notice that the destructor is virtual. This is because there may be additional private members in the sub classes that this base class doesn&#8217;t know about. Not declaring the destructor as virtual would likely lead to memory leaks.</p> 
+<p>We can now start coming up with plants we&#8217;d like to put in our garden. For this example, I&#8217;ve created Carrot, Potato, and Eggplant classes. Each of these classes has a unique implementation of the <code>isRipe()</code> function.
+</p>
+
+<div class="highlight"><pre><code class="c"><span class="n">class</span> <span class="n">Carrot</span> <span class="o">:</span> <span class="n">public</span> <span class="n">Plant</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Carrot</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s">&quot;Orange&quot;</span><span class="p">;</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+	
+  <span class="k">virtual</span> <span class="n">bool</span> <span class="n">isRipe</span><span class="p">()</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">height</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+ 
+<span class="n">class</span> <span class="n">Potato</span> <span class="o">:</span> <span class="n">public</span> <span class="n">Plant</span>
+<span class="p">{</span>
+  <span class="n">Potato</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s">&quot;Brown&quot;</span><span class="p">;</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+	
+  <span class="k">virtual</span> <span class="n">bool</span> <span class="n">isRipe</span><span class="p">()</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">height</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+ 
+<span class="n">class</span> <span class="n">Eggplant</span> <span class="o">:</span> <span class="n">public</span> <span class="n">Plant</span>
+<span class="p">{</span>
+  <span class="n">Eggplant</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s">&quot;Purple&quot;</span><span class="p">;</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+	
+  <span class="k">virtual</span> <span class="n">bool</span> <span class="n">isRipe</span><span class="p">()</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">height</span> <span class="o">&gt;=</span> <span class="mi">13</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+
+<p>
+	Nothing too fancy here, but you can see that each class has a different (albeit simple) way of checking if the plant is ripe.
+</p> 
+
+
+<p>
+	Moving forward, we can implement our Garden class. The Garden class is essentially a collection of plants. We&#8217;re going to store our plants in a vector. Well, really we&#8217;re storing pointers to our plants in a vector. Since there is no way of knowing how much memory each plant will use, we cannot store plants directly. We must store pointers to the plants, which could be of type potato, eggplant, or carrot.
+</p>
+
+<div class="highlight"><pre><code class="c"><span class="n">class</span> <span class="n">Garden</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Garden</span><span class="p">();</span>
+  <span class="n">addPlant</span><span class="p">(</span><span class="n">Plant</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">plants</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+  <span class="p">}</span>
+	
+  <span class="n">harvest</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">fplants</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="n">plants</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">isRipe</span><span class="p">())</span>
+      <span class="p">{</span>
+        <span class="n">plants</span><span class="p">.</span><span class="n">delete</span><span class="p">(</span><span class="n">plants</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="c1">//Remove ripe plants from garden</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+ 
+<span class="nl">private:</span>
+  <span class="n">vector</span><span class="o">&lt;*</span><span class="n">Plant</span><span class="o">&gt;</span> <span class="n">plants</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+
+<p>And there you have it. We have a very simple, and fairly useless e-garden. I&#8217;ll leave it up to you to code the army of slugs and snails to destroy it. Oh, and be sure to make a virtual class gastropod.</p> 
+
+	<div id="disqus_thread">
+		<script type="text/javascript">
+  var disqus_developer = 1;
+  var disqus_shortname = 'happygastropod';
+  var disqus_identifier = '/2010/03/c-plus-plus-virtual-class-inheritance';
+	var disqus_url = "http://happygastropod.com/2010/03/c-plus-plus-virtual-class-inheritance";
+  var disqus_title = 'C++ Virtual Class Inheritance';
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+	</div>
+</div>
+			</div>
+		</section>
+		<footer id="foot">
+			<div id="recent-projects">
+				<h3>Recent Projects</h3>
+<ul>
+    <li><a href="http://happygastropod.com:4567">Jook</a></li>
+	<li><a href="http://github.com/thegastropod/peanut">Peanut</a></li>
+	<li><a href="http://slu.ug">slu.ug</a></li>
+	<li><a href="http://github.com/thegastropod/brightcms">bright cms</a></li>
+</ul>
+
+			</div>
+			<div id="recent-posts">
+				<h3>Recent Posts</h3>
+<ul>
+
+	<li><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></li>
+
+	<li><a href="/2011/03/a-centralized-boom-server-using-redis">A Centralized Boom Server Using Redis</a></li>
+
+	<li><a href="/2011/01/pianobar-on-mac-osx">Pianobar On Mac OS X</a></li>
+
+	<li><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></li>
+
+</ul>
+			</div>
+			<div id="friends">
+				<h3>Friends</h3>
+<ul>
+	<li><a href="http://notesfromnicole.com">Notes From Nicole</a></li>
+	<li><a href="http://chrisrhoden.com">Chris Rhoden</a></li>
+	<li><a href="http://erikimh.com">ErikIMH</a></li>
+	<li><a href="http://redkrieg.com">RedKrieg</a></li>
+	<li><a href="http://crspeedy.com">CRSpeedy</a></li>
+	<li><a href="http://metaskills.com">MetaSkills</a></li>
+</ul>
+			</div>				
+		</footer>
+	</body>
+</html>

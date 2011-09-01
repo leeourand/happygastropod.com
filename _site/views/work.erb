@@ -1,0 +1,61 @@
+<% @title = "Work" %>
+
+<h2>My Portfolio</h2>
+<h3 id="work_web">Web</h3>
+<% for project in @projects %>
+<% if(project.project_type=="Web")%>
+	<div class="portfolio_item">
+		<div class="portfolio_info">
+			<h4><%= project.title %></h4>
+			<%= RedCloth.new(project.description).to_html %>
+			<a class="view_larger" href="<%=project.full_image%>" rel="lightbox">View Larger</a>
+			<% if(project.url) %>
+			<a class="visit_site" href="<%=project.url%>">Visit Site</a>
+			<% end %>
+		</div>
+		<img class="thumb" src="<%=project.thumbnail_image%>" alt="<%=project.title%> Thumbnail" />
+	</div>
+<% end %>
+<% end %>
+
+<h3 id="work_print">Print</h3>
+<% for project in @projects %>
+<% if(project.project_type=="Print")%>
+	<div class="portfolio_item">
+		<div class="portfolio_info">
+			<h4><%= project.title %></h4>
+			<%= RedCloth.new(project.description).to_html %>
+			<a class="view_larger" href="<%=project.full_image%>" rel="lightbox">View Larger</a>
+		</div>
+		<img class="thumb" src="<%=project.thumbnail_image%>" alt="<%=project.title%> Thumbnail" />
+	</div>
+<% end %>
+<% end %>
+
+<h3 id="work_identity">Identity</h3>
+<% for project in @projects %>
+<% if(project.project_type=="Identity")%>
+	<div class="portfolio_item">
+		<div class="portfolio_info">
+			<h4><%= project.title %></h4>
+			<%= RedCloth.new(project.description).to_html %>
+			<a class="view_larger" href="<%=project.full_image%>" rel="lightbox">View Larger</a>
+		</div>
+		<img class="thumb" src="<%=project.thumbnail_image%>" alt="<%=project.title%> Thumbnail" />
+	</div>
+<% end %>
+<% end %>
+
+<h3 id="work_render">Render</h3>
+<% for project in @projects %>
+<% if(project.project_type=="Render")%>
+	<div class="portfolio_item">
+		<div class="portfolio_info">
+			<h4><%= project.title %></h4>
+			<%= RedCloth.new(project.description).to_html %>
+			<a class="view_larger" href="<%=project.full_image%>" rel="lightbox">View Larger</a>
+		</div>
+		<img class="thumb" src="<%=project.thumbnail_image%>" alt="<%=project.title%> Thumbnail" />
+	</div>
+<% end %>
+<% end %>

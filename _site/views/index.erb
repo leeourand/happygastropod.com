@@ -1,0 +1,9 @@
+<% @title = "Home" %>
+
+<% for post in @posts do %>
+	<div class="arcitle">
+		<h2><%= post.title %></h2>
+		<h3><%= post.posted_on.strftime("%B %d %Y") %></h3>
+		<%= RedCloth.new(post.body).to_html %>
+	</div>
+<% end %>

@@ -1,0 +1,16 @@
+<% @title = "Admin" %>
+
+<h2>Admin</h2>
+<h3>Edit Post</h3>
+<form action="/edit_post" method="post">
+	<input type="hidden" name="id" value="<%=@post.id%>">
+	<fieldset>
+		<label for="title">Title</label>
+		<input type="text" name="title" id="title" value="<%=@post.title%>" />
+	</fieldset>
+	<fieldset>
+		<label for="body">Body</label>
+		<textarea name="body" id="body" cols="40" rows="12"><%=@post.body%></textarea>
+	</fieldset>
+	<input type="image" src="/images/submit.gif" value="Create" />
+</form>

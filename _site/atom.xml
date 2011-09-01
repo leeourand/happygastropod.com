@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>HappyGastropod.com</title>
+ <link href="http://happygastropod.com/atom.xml" rel="self"/>
+ <link href="http://happygastropod.com/"/>
+ <updated>2011-09-01T12:07:52-04:00</updated>
+ <id>http://happygastropod.com/</id>
+ <author>
+   <name>Lee Ourand</name>
+   <email>lee@happygastropod.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>July CVREG Meetup</title>
+   <link href="http://happygastropod.com/2011/07/july-cvreg-meetup"/>
+   <updated>2011-07-10T00:00:00-04:00</updated>
+   <id>http://happygastropod.com/2011/07/july-cvreg-meetup</id>
+   <content type="html">&lt;p&gt;Last night was the &lt;a href='http://cvreg.org/http://www.cvreg.org/2011/7/9/july-summer-social'&gt;July CVREG&lt;/a&gt; meetup, and the &lt;a href='http://757rb.org'&gt;757rb&lt;/a&gt; regulars decided to take a road trip to visit the Legend Brewery, and talk Ruby with our Richmond friends. The theme of the evening was Ruby&amp;#8217;s role in doing freelance/contract work. They had a panel of four self-employed Rubyists who answered some questions about working with Ruby as a one-man-shop.&lt;/p&gt;
+
+&lt;p&gt;One of the interesting questions that came up was &amp;#8220;Is it difficult to &amp;#8216;sell&amp;#8217; Ruby to clients?&amp;#8221; All of the members of the panel had experienced at least one client who was scared off by the fact that they were using Ruby. It goes to show that despite the hard work put in by so many in the Ruby community, and the so blatantly obvious golden beacons that show Ruby does scale (Github, Gowalla, all 37signals products, etc.), a few strategic &amp;#8220;RUBY IS SLOW&amp;#8221; statements have seriously devastated the public understanding of the language.&lt;/p&gt;
+
+&lt;p&gt;Demonstrating that it works, providing benchmarks that smack down PHP, and showing that we can develop applications faster with Ruby don&amp;#8217;t matter. The fact that Ruby is &amp;#8220;weird&amp;#8221; and &amp;#8220;slow&amp;#8221; make it a non-starter for so many. So what can we do to make Ruby more accepted?&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>A Centralized Boom Server Using Redis</title>
+   <link href="http://happygastropod.com/2011/03/a-centralized-boom-server-using-redis"/>
+   <updated>2011-03-25T00:00:00-04:00</updated>
+   <id>http://happygastropod.com/2011/03/a-centralized-boom-server-using-redis</id>
+   <content type="html">&lt;p&gt;So, I&amp;#8217;ve been thinking how cool it would be to setup a collaborative &lt;a href='http://zachholman.com/boom/'&gt;Boom&lt;/a&gt; database. With its recent support for Redis and MongoDB, I figured it was a good time to give this crazy idea a whirl. So, let&amp;#8217;s run through the basic requirements to set this up. Fending off the baddies from deleting your beautiful lists is up to you, I must warn. What I&amp;#8217;m going to explain in this example is how to do the following:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Install Redis on a centralized server&lt;/li&gt;
+
+&lt;li&gt;Install Boom&lt;/li&gt;
+
+&lt;li&gt;Configure Boom to use the centralized server&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id='install_redis'&gt;Install Redis&lt;/h4&gt;
+
+&lt;p&gt;Installing Redis is really easy. At the time of writing, the latest version of Redis is 2.2.2. Redis is under somewhat heavy development, so you may want to check to see if there&amp;#8217;s a newer version. To install 2.2.2, run the following in your teminal:&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;&lt;span class='nv'&gt;$ &lt;/span&gt;wget http://redis.googlecode.com/files/redis-2.2.2.tar.gz
+&lt;span class='nv'&gt;$ &lt;/span&gt;tar xvzf redis-2.2.2.tar.gz
+&lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd &lt;/span&gt;redis-2.2.2
+&lt;span class='nv'&gt;$ &lt;/span&gt;make &lt;span class='o'&gt;&amp;amp;&amp;amp;&lt;/span&gt; make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now that Redis is installed, you can fire up the server with, strangely enough, &lt;code&gt;redis-server&lt;/code&gt;. By default, it&amp;#8217;s going to run the server on port 6379. If you&amp;#8217;re running a firewall on the server you&amp;#8217;re installing this on (you are running a firewall, aren&amp;#8217;t you?), you will need to open up this port.&lt;/p&gt;
+
+&lt;p&gt;To test that everything&amp;#8217;s working, you can use the always handy telnet. In your command line, you can do the following:&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;&lt;span class='nv'&gt;$ &lt;/span&gt;telnet &amp;lt;hostname&amp;gt; 6379
+&amp;gt; SET hello thar
+&amp;gt; GET hello
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;You should get responses back from the Redis server showing that the value was stored during the &lt;code&gt;SET&lt;/code&gt;, and return your &amp;#8220;thar&amp;#8221; when you &lt;code&gt;GET&lt;/code&gt;. Redis &lt;em&gt;is&lt;/em&gt; pretty cool, huh?&lt;/p&gt;
+
+&lt;h4 id='installing_boom'&gt;Installing BOOM&lt;/h4&gt;
+
+&lt;p&gt;Onto installing boom on your local machine. I&amp;#8217;m going to assume you have ruby and rubygems already installed and setup. Boom, itself, has one dependency: yajl-ruby. If you don&amp;#8217;t already have this, go ahead and install it with &lt;code&gt;gem install yajl-ruby&lt;/code&gt;. Once you&amp;#8217;ve got yajl, a simple &lt;code&gt;gem install boom&lt;/code&gt; will get you rolling with Boom. Now that you&amp;#8217;ve got boom installed, run &lt;code&gt;boom&lt;/code&gt; in your terminal to initialize your configuration file and your default .boom json file. Go ahead and give it a stab, and get a feel for how to use it. &lt;code&gt;boom help&lt;/code&gt; will get you started. Once you&amp;#8217;re comfortable with its amazing powers of organization, let&amp;#8217;s move forward and configure it to use Redis.&lt;/p&gt;
+
+&lt;h4 id='configuring_boom_for_redis'&gt;Configuring Boom For Redis&lt;/h4&gt;
+
+&lt;p&gt;To use Boom with our new Redis server, you&amp;#8217;ll need to install the Redis gem: &lt;code&gt;gem install redis&lt;/code&gt;. Next, you&amp;#8217;ll need to crack open your newly created ~/.boom.conf file in your favorite text-editor, and edit it to look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;backend&amp;quot;: &amp;quot;redis&amp;quot;,
+  &amp;quot;redis&amp;quot;: {
+    &amp;quot;port&amp;quot;: &amp;quot;6379&amp;quot;,
+    &amp;quot;host&amp;quot;: &amp;quot;your-host-name.com&amp;quot;
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You&amp;#8217;ll obviously be swapping out the cleverly named &amp;#8220;your-host-name.com&amp;#8221; to whatever your hostname actually is. Once that bit of configuration is done, boom will be using your centralized redis database to store its contents. Neat! You and your friends or co-workers can now share this, and get into all sorts of mischief! Enjoy it.&lt;/p&gt;
+
+&lt;h4 id='where_to_go_from_here'&gt;Where To Go From Here&lt;/h4&gt;
+
+&lt;p&gt;This is obviously not an ideal setup. It&amp;#8217;s open to anyone with an internet connection, so you may want to do IP-based verification, some kind of authentication scheme, etc. Your server is just running in your SSH session, if you stop with where I left you. You&amp;#8217;ll likely want to setup an rc.d / init.d script to fire up the redis server for you on startup. You also will probably want some kind of data persistence, since Redis stores all data in memory (although it will periodically dump to disk).&lt;/p&gt;
+
+&lt;p&gt;In all, this is a pretty neat concept. I&amp;#8217;m not sure how well it will work with co-workers or friends, since everyone has full read/write access to everything. But for compiling lists of funny image urls, command line one-liners, canned e-mail responses, etc., you may just find that this comes in handy if everyone is cooperative.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Pianobar On Mac OS X</title>
+   <link href="http://happygastropod.com/2011/01/pianobar-on-mac-osx"/>
+   <updated>2011-01-25T00:00:00-05:00</updated>
+   <id>http://happygastropod.com/2011/01/pianobar-on-mac-osx</id>
+   <content type="html">&lt;p&gt;Recently, my friend &lt;a href='http://redkrieg.com/2011/01/02/pianobar-an-open-source-pandora-client/'&gt;Brandon&lt;/a&gt; wrote about using &lt;a href='https://github.com/PromyLOPh/pianobar'&gt;Pianobar&lt;/a&gt; on Linux (specifically on Debian based systems). In every attempt to steal his thunder, I&amp;#8217;m copying him, and posting about how to get the same thing working on Mac OS X with similar functionality.&lt;/p&gt;
+
+&lt;p&gt;For those unfamiliar, Pianobar is a command line interface to &lt;a href='http://pandora.com'&gt;Pandora&lt;/a&gt;, which is more gentle on your memory footprint (no Adobe anything!), and is easier to tuck away in the background. We&amp;#8217;re going to do a few things in this brief tutorial:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Setup homebrew if you have not already&lt;/li&gt;
+
+&lt;li&gt;Install Pianobar&lt;/li&gt;
+
+&lt;li&gt;Install growlnotify&lt;/li&gt;
+
+&lt;li&gt;Configure Pianobar&lt;/li&gt;
+
+&lt;li&gt;Setup Growl notification for Pianobar&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id='installing_homebrew'&gt;Installing Homebrew&lt;/h4&gt;
+
+&lt;p&gt;Frankly, you should be ashamed of yourself if you haven&amp;#8217;t installed homebrew yet on your mac. To put it plainly, it&amp;#8217;s the bee&amp;#8217;s knees. Alright, now that you&amp;#8217;re convinced, let&amp;#8217;s get started.&lt;/p&gt;
+
+&lt;p&gt;Installation is really difficult, so be prepared for some heartache and pain. First, run this in your terminal:&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;curl -L http://github.com/mxcl/homebrew/tarball/master | tar xz --strip 1 -C /usr/local
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;AND THAT&amp;#8217;S IT. Difficult, eh?&lt;/p&gt;
+
+&lt;h4 id='installing_pianobar'&gt;Installing Pianobar&lt;/h4&gt;
+
+&lt;p&gt;So now that we&amp;#8217;ve made it through that grueling task, we can move forward and install pianobar using our favorite package manager (in case you&amp;#8217;ve forgotten already that&amp;#8217;s homebrew. We just installed it. Pay attention.) Run this whiz-bang command in your terminal:&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;brew install pianobar
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;BANG! You&amp;#8217;re ready to listen to some Pandora through your terminal. You can go ahead and try it out by typing &lt;code&gt;pianobar&lt;/code&gt; in your terminal. Go ahead. I&amp;#8217;ll wait.&lt;/p&gt;
+
+&lt;h4 id='install_growl_notify'&gt;Install Growl Notify&lt;/h4&gt;
+
+&lt;p&gt;This probably doesn&amp;#8217;t even merit its own step. But let&amp;#8217;s go ahead anyways.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;brew install growlnotify
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id='configure_pianobar'&gt;Configure Pianobar&lt;/h4&gt;
+
+&lt;p&gt;We&amp;#8217;re getting there. I&amp;#8217;m proud of you for making it this far. Well done.&lt;/p&gt;
+
+&lt;p&gt;So Pianobar has a few things that you can set in a config file so that you don&amp;#8217;t have to set these each time you load the application. These are things like your Pandora username, your password, and something else we&amp;#8217;ll be talking about in the next section, the event_command. It sounds pretty complicated, but we&amp;#8217;ll get through it. I promise.&lt;/p&gt;
+
+&lt;p&gt;So, open up your favorite text editor (unless it&amp;#8217;s TextEdit, in which case, please just leave my site), and edit &lt;code&gt;~/.config/pianobar/config&lt;/code&gt;. You&amp;#8217;ll enter in the following lines:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user = you@youraddress.com
+password = hopefullyNot123456&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Go ahead. Give Pianobar another whirl. It should log you in automatically. Pretty fancy, huh? Onward!&lt;/p&gt;
+
+&lt;h4 id='setup_growl_notification'&gt;Setup Growl Notification&lt;/h4&gt;
+
+&lt;p&gt;You can obviously skip this part if you find Growl obnoxious or annoying. I happen to like it. It&amp;#8217;s like a good friend who keeps you informed when exciting events are happening. I call him Ralph.&lt;/p&gt;
+
+&lt;p&gt;So, don&amp;#8217;t get angry, but remember that pianobar configuration file? Yea? Ok, we&amp;#8217;re going to edit that once again. So open it up again in anything but TextEdit, and we&amp;#8217;re going to add this line to the bottom:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;event_command = /Users/yourusername/bin/pianobar-notify.rb&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Obviously, you&amp;#8217;ll want to swap out &amp;#8220;yourusername&amp;#8221; for your actual username. If you don&amp;#8217;t know what it is, you can use the &lt;code&gt;whoami&lt;/code&gt; command. You&amp;#8217;re welcome.&lt;/p&gt;
+
+&lt;p&gt;Now the exciting part. We&amp;#8217;re going to write a simple little program (in Ruby) to let us know some info about new songs that are being played through Pianobar. Ok, it&amp;#8217;s not really THAT exciting, but still pretty cool. Let&amp;#8217;s open up our text editors for one final edit. This time we&amp;#8217;re opening the &lt;code&gt;/Users/yourusername/bin/pianobar-notify.rb&lt;/code&gt; file. Ok, now that you&amp;#8217;ve got your file open (welcome back, by the way), you&amp;#8217;re going to type (or you can copy/paste if you really want to) this:&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;&lt;span class='c1'&gt;#!/usr/bin/ruby&lt;/span&gt;
+
+&lt;span class='n'&gt;trigger&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='no'&gt;ARGV&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;shift&lt;/span&gt;
+
+&lt;span class='k'&gt;if&lt;/span&gt; &lt;span class='n'&gt;trigger&lt;/span&gt; &lt;span class='o'&gt;==&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;songstart&amp;#39;&lt;/span&gt;
+  &lt;span class='n'&gt;songinfo&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='p'&gt;{}&lt;/span&gt;
+
+  &lt;span class='no'&gt;STDIN&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;each_line&lt;/span&gt; &lt;span class='p'&gt;{&lt;/span&gt; &lt;span class='o'&gt;|&lt;/span&gt;&lt;span class='n'&gt;line&lt;/span&gt;&lt;span class='o'&gt;|&lt;/span&gt; &lt;span class='n'&gt;songinfo&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;store&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='o'&gt;*&lt;/span&gt;&lt;span class='n'&gt;line&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;chomp&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;split&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='s1'&gt;&amp;#39;=&amp;#39;&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='mi'&gt;2&lt;/span&gt;&lt;span class='p'&gt;))}&lt;/span&gt;
+  &lt;span class='sb'&gt;`growlnotify -t &amp;quot;Now Playing&amp;quot; -m &amp;quot;&lt;/span&gt;&lt;span class='si'&gt;#{&lt;/span&gt;&lt;span class='n'&gt;songinfo&lt;/span&gt;&lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='s1'&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt;&lt;span class='si'&gt;}&lt;/span&gt;&lt;span class='se'&gt;\n&lt;/span&gt;&lt;span class='sb'&gt;by &lt;/span&gt;&lt;span class='si'&gt;#{&lt;/span&gt;&lt;span class='n'&gt;songinfo&lt;/span&gt;&lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='s1'&gt;&amp;#39;artist&amp;#39;&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt;&lt;span class='si'&gt;}&lt;/span&gt;&lt;span class='sb'&gt;&amp;quot;`&lt;/span&gt;
+&lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Save the file, and you&amp;#8217;re done. You can now listen to your favorite tunes through the command line, see who&amp;#8217;s playing when new songs start, and you&amp;#8217;re now up to speed with the latest in package management fashion for the Mac platform.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Testing Nested Resources In Rails 3</title>
+   <link href="http://happygastropod.com/2010/10/testing-nested-resources-in-rails-3"/>
+   <updated>2010-10-21T00:00:00-04:00</updated>
+   <id>http://happygastropod.com/2010/10/testing-nested-resources-in-rails-3</id>
+   <content type="html">&lt;p&gt;
+	I recently ran into some problems when trying to run my functional tests while using nested resources in the new Rails 3. My routing was setup for nested resources, Foo has many Bars.
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:foos&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:bars&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;
+	I used a rather contrived test to get started.
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;that I can GET the index&amp;quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:index&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;assert_response&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:success&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;The first error that I received, when using this fairly basic test was:&lt;/p&gt;
+
+&lt;code&gt;NoMethodError: undefined method `recycle!` for #&amp;lt;Bar:0x1033f09e0&amp;gt;&lt;/code&gt;
+
+&lt;p&gt;This error is easily corrected by renaming the fixture instance variable youre likely declaring in your setup. In my case, the Bar resource name needed to be updated.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;setup&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# @bar = bars(:one) Change to:&lt;/span&gt;
+  &lt;span class=&quot;vi&quot;&gt;@my_bar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bars&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:one&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;ActionController has its own set of instance variables named after the controller. In the commented out case above, you are squashing Rails instance variable, which causes this error.&lt;/p&gt;
+
+&lt;p&gt;After correcting this issue, I was still having problems.&lt;/p&gt;
+
+&lt;code&gt;ActionController::RoutingError: No route matches {:controller=&amp;gt;&quot;bar&quot;}&lt;/code&gt;
+&lt;p&gt;This was another really basic fix that took me longer than I care to admit to resolve. To fix this, you simply need to fix your test case to provide the parent resource id.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;that I can GET the index&amp;quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:foo_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@my_foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;assert_response&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:success&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Note that youll also need to declare a &lt;code&gt;@my_foo&lt;/code&gt; variable in your setup for this to work. Otherwise, you can just use any number to get the routing to work. Happy testing!&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Jacobi Iteration With Ruby</title>
+   <link href="http://happygastropod.com/2010/04/jacobi-iteration-with-ruby"/>
+   <updated>2010-04-28T00:00:00-04:00</updated>
+   <id>http://happygastropod.com/2010/04/jacobi-iteration-with-ruby</id>
+   <content type="html">&lt;p&gt;
+	When solving linear algebraic systems, it is often beneficial to use iterative methods. Iterative solvers are particularly useful when a matrix is diagonally dominant. One such iterative method that is particularly useful is Jacobi Iteration.
+&lt;/p&gt;
+
+&lt;p&gt;
+	Given a matrix &lt;em&gt;A&lt;/em&gt;, you first decompose it into 3 separate matrices: &lt;em&gt;L&lt;/em&gt;, &lt;em&gt;D&lt;/em&gt;, and &lt;em&gt;U&lt;/em&gt;. These are the &lt;em&gt;lower&lt;/em&gt;, &lt;em&gt;diagonal&lt;/em&gt;, and &lt;em&gt;upper&lt;/em&gt; sections of the matrix, respectively.&lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_decomposition.gif&quot; alt=&quot;Jacobi Decomposition&quot; /&gt;
+&lt;/p&gt; 
+
+&lt;p&gt;
+	For example, let&amp;#8217;s assume we&amp;#8217;ve been given this matrix A:&lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_a_matrix.gif&quot; alt=&quot;Example Matrix&quot; /&gt;
+&lt;/p&gt; 
+
+&lt;p&gt;
+	We will then zero-out everything above and including the diagonal entries. This will give us our new L matrix.&lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_l_matrix.gif&quot; alt=&quot;Example L Matrix&quot; /&gt;
+&lt;/p&gt; 
+
+&lt;p&gt;Likewise, we&amp;#8217;ll remove all entries below, and including the diagonal from matrix A to give us our matrix U. &lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_u_matrix.gif&quot; alt=&quot;Example U Matrix&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Finally, we&amp;#8217;ll zero-out all non-diagonal entries, to yield our new matrix D.&lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_d_matrix.gif&quot; alt=&quot;Example D Matrix&quot; /&gt;
+&lt;/p&gt; 
+
+&lt;p&gt;
+	As stated previously, since &lt;em&gt;A=L+D+U&lt;/em&gt;, we can deduce that &lt;em&gt;Ax=Dx+(L+U)x&lt;/em&gt;. And since &lt;em&gt;Ax=b&lt;/em&gt;, we can conclude that &lt;em&gt;Dx=b-(L+U)x&lt;/em&gt;, which is the basis of Jacobi&amp;#8217;s Method.
+&lt;/p&gt; 
+
+&lt;p&gt;
+	Given an estimate vector (x) (which is generally initialized to 0 if no educated guess can be provided), the next estimate is found by:&lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_basis.gif&quot; alt=&quot;Basic Jacobi Form&quot; /&gt;
+&lt;/p&gt; 
+
+&lt;p&gt;
+	And since &lt;em&gt;D&lt;/em&gt; is a diagonal matrix, the above equation can be rewritten in terms of the components of &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;.&lt;br /&gt; 
+&lt;img class=&quot;math&quot; src=&quot;/assets/jacobi_complete.gif&quot; alt=&quot;Jacobi Equation&quot; /&gt;&lt;br /&gt; 
+&lt;br style=&quot;clear: both;&quot; /&gt; 
+So now that we understand how Jacobi Iteration works, we can write a program to do it for us! Ruby is not necessarily the best language to do this in, as these systems can often times be quite large. Compiled languages such as C++ are going to converge much faster.&lt;/p&gt; 
+&lt;p&gt;To start out, we&amp;#8217;re going to write a method that takes in our Matrix &lt;em&gt;A&lt;/em&gt;, our right hand size &lt;em&gt;b&lt;/em&gt;, the number of times we&amp;#8217;d like to iterate, and our initial guess.
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;jacobi_iteration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iterations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;
+	From here, we will need to fire up our estimate vector &lt;em&gt;x&lt;/em&gt;. We&amp;#8217;ll initialize its first element to be the initial &amp;#8220;guess,&amp;#8221; and the remaining entries to be 0.
+&lt;/p&gt; 
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;  &lt;span class=&quot;c1&quot;&gt;# Initialize&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guess&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;upto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;
+	Finally, we implement the equation above as nested loops to iteratively try to converge to a solution.
+&lt;/p&gt; 
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;  &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;upto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iterations&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;its&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;upto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+      &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;upto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;unless&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;And there you have it! If you're doing this on large matrices, I would definitely suggest using a different language, such as C++ to handle this, since Ruby can not only be a bit slower, but it's also quite a memory hog when dealing with so many objects.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>NGINX Config: http to https</title>
+   <link href="http://happygastropod.com/2010/04/nginx-config-http-to-https"/>
+   <updated>2010-04-18T00:00:00-04:00</updated>
+   <id>http://happygastropod.com/2010/04/nginx-config-http-to-https</id>
+   <content type="html">&lt;p&gt;
+	I’ve recently installed a self-signed certificate on my server just for the login areas for my own peace of mind. After having a rough time trying to handle the redirection from Rack itself, I opted to do this through NGINX, which turned out to be quite a bit easier. Below is a snippet of the virtual host I used:
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            listen   80;
+            server_name happygastropod.com;
+            rewrite ^/admin https://happygastropod.com/admin permanent;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;
+	It’s pretty self explanatory. Takes a regular expression of the path you’d like to redirect, and simply redirect it off to the https alternative. Enjoy.
+&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>C++ Virtual Class Inheritance</title>
+   <link href="http://happygastropod.com/2010/03/c-plus-plus-virtual-class-inheritance"/>
+   <updated>2010-03-11T00:00:00-05:00</updated>
+   <id>http://happygastropod.com/2010/03/c-plus-plus-virtual-class-inheritance</id>
+   <content type="html">&lt;p&gt;
+	Virtual Class Inheritance is something many people (myself included) have a difficult time wrapping their heads around initially. It can be a useful tool, so I’m going to try to explain it a little bit here.
+&lt;/p&gt;
+
+&lt;p&gt;
+	Let’s suppose we have a Garden with different kinds of plants growing in it (how original.) We can start out by creating a very general class called Plant. With generalization in mind, we can only specify attributes and functions that all plants share.
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;public:&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	
+  &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getHeight&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isRipe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;nl&quot;&gt;protected:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//inches&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;
+	You&amp;#8217;ll notice that the &lt;code&gt;isRipe()&lt;/code&gt; function has the keyword &amp;#8220;virtual&amp;#8221; next to it, and it&amp;#8217;s set to equal 0. This defines a virtual function that is not defined in the base class. There is no way of knowing whether a plant is ripe without knowing what kind of plant it is. So we will define this function in the sub-classes.
+&lt;/p&gt;
+
+&lt;p&gt;
+	You should also notice that the destructor is virtual. This is because there may be additional private members in the sub classes that this base class doesn&amp;#8217;t know about. Not declaring the destructor as virtual would likely lead to memory leaks.&lt;/p&gt; 
+&lt;p&gt;We can now start coming up with plants we&amp;#8217;d like to put in our garden. For this example, I&amp;#8217;ve created Carrot, Potato, and Eggplant classes. Each of these classes has a unique implementation of the &lt;code&gt;isRipe()&lt;/code&gt; function.
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Carrot&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;public:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Carrot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Orange&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isRipe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+ 
+&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Potato&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Potato&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Brown&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isRipe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+ 
+&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Eggplant&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Eggplant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Purple&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;isRipe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;
+	Nothing too fancy here, but you can see that each class has a different (albeit simple) way of checking if the plant is ripe.
+&lt;/p&gt; 
+
+
+&lt;p&gt;
+	Moving forward, we can implement our Garden class. The Garden class is essentially a collection of plants. We&amp;#8217;re going to store our plants in a vector. Well, really we&amp;#8217;re storing pointers to our plants in a vector. Since there is no way of knowing how much memory each plant will use, we cannot store plants directly. We must store pointers to the plants, which could be of type potato, eggplant, or carrot.
+&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;c&quot;&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Garden&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nl&quot;&gt;public:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Garden&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;addPlant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plants&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;push_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	
+  &lt;span class=&quot;n&quot;&gt;harvest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fplants&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plants&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isRipe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;plants&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plants&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//Remove ripe plants from garden&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ 
+&lt;span class=&quot;nl&quot;&gt;private:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Plant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plants&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;And there you have it. We have a very simple, and fairly useless e-garden. I&amp;#8217;ll leave it up to you to code the army of slugs and snails to destroy it. Oh, and be sure to make a virtual class gastropod.&lt;/p&gt; 
+</content>
+ </entry>
+ 
+ 
+</feed>

@@ -1,0 +1,15 @@
+<% @title = "Admin" %>
+
+<h2>Admin</h2>
+<h3>New Trail</h3>
+<form action="/new_trail" method="post">
+	<fieldset>
+		<label for="url">URL</label>
+		<input type="text" name="url" id="url" />
+	</fieldset>
+	<fieldset>
+		<label for="body">Body</label>
+		<textarea name="body" id="body" cols="40" rows="12"></textarea>
+	</fieldset>
+	<input type="image" src="/images/submit.gif" value="Create" />
+</form>

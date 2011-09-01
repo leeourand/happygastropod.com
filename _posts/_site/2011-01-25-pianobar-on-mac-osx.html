@@ -1,0 +1,85 @@
+<p>Recently, my friend <a href='http://redkrieg.com/2011/01/02/pianobar-an-open-source-pandora-client/'>Brandon</a> wrote about using <a href='https://github.com/PromyLOPh/pianobar'>Pianobar</a> on Linux (specifically on Debian based systems). In every attempt to steal his thunder, I&#8217;m copying him, and posting about how to get the same thing working on Mac OS X with similar functionality.</p>
+
+<p>For those unfamiliar, Pianobar is a command line interface to <a href='http://pandora.com'>Pandora</a>, which is more gentle on your memory footprint (no Adobe anything!), and is easier to tuck away in the background. We&#8217;re going to do a few things in this brief tutorial:</p>
+
+<ul>
+<li>Setup homebrew if you have not already</li>
+
+<li>Install Pianobar</li>
+
+<li>Install growlnotify</li>
+
+<li>Configure Pianobar</li>
+
+<li>Setup Growl notification for Pianobar</li>
+</ul>
+
+<h4 id='installing_homebrew'>Installing Homebrew</h4>
+
+<p>Frankly, you should be ashamed of yourself if you haven&#8217;t installed homebrew yet on your mac. To put it plainly, it&#8217;s the bee&#8217;s knees. Alright, now that you&#8217;re convinced, let&#8217;s get started.</p>
+
+<p>Installation is really difficult, so be prepared for some heartache and pain. First, run this in your terminal:</p>
+<div>
+  <pre>
+    <code class='bash'>curl -L http://github.com/mxcl/homebrew/tarball/master | tar xz --strip 1 -C /usr/local</code>
+  </pre>
+</div>
+<p>AND THAT&#8217;S IT. Difficult, eh?</p>
+
+<h4 id='installing_pianobar'>Installing Pianobar</h4>
+
+<p>So now that we&#8217;ve made it through that grueling task, we can move forward and install pianobar using our favorite package manager (in case you&#8217;ve forgotten already that&#8217;s homebrew. We just installed it. Pay attention.) Run this whiz-bang command in your terminal:</p>
+<div>
+  <pre>
+    <code class='bash'>brew install pianobar</code>
+  </pre>
+</div>
+<p>BANG! You&#8217;re ready to listen to some Pandora through your terminal. You can go ahead and try it out by typing <code>pianobar</code> in your terminal. Go ahead. I&#8217;ll wait.</p>
+
+<h4 id='install_growl_notify'>Install Growl Notify</h4>
+
+<p>This probably doesn&#8217;t even merit its own step. But let&#8217;s go ahead anyways.</p>
+<div>
+  <pre>
+    <code class='bash'>brew install growlnotify</code>
+  </pre>
+</div>
+<h4 id='configure_pianobar'>Configure Pianobar</h4>
+
+<p>We&#8217;re getting there. I&#8217;m proud of you for making it this far. Well done.</p>
+
+<p>So Pianobar has a few things that you can set in a config file so that you don&#8217;t have to set these each time you load the application. These are things like your Pandora username, your password, and something else we&#8217;ll be talking about in the next section, the event_command. It sounds pretty complicated, but we&#8217;ll get through it. I promise.</p>
+
+<p>So, open up your favorite text editor (unless it&#8217;s TextEdit, in which case, please just leave my site), and edit <code>~/.config/pianobar/config</code>. You&#8217;ll enter in the following lines:</p>
+
+<pre><code>user = you@youraddress.com
+password = hopefullyNot123456</code></pre>
+
+<p>Go ahead. Give Pianobar another whirl. It should log you in automatically. Pretty fancy, huh? Onward!</p>
+
+<h4 id='setup_growl_notification'>Setup Growl Notification</h4>
+
+<p>You can obviously skip this part if you find Growl obnoxious or annoying. I happen to like it. It&#8217;s like a good friend who keeps you informed when exciting events are happening. I call him Ralph.</p>
+
+<p>So, don&#8217;t get angry, but remember that pianobar configuration file? Yea? Ok, we&#8217;re going to edit that once again. So open it up again in anything but TextEdit, and we&#8217;re going to add this line to the bottom:</p>
+
+<pre><code>event_command = /Users/yourusername/bin/pianobar-notify.rb</code></pre>
+
+<p>Obviously, you&#8217;ll want to swap out &#8220;yourusername&#8221; for your actual username. If you don&#8217;t know what it is, you can use the <code>whoami</code> command. You&#8217;re welcome.</p>
+
+<p>Now the exciting part. We&#8217;re going to write a simple little program (in Ruby) to let us know some info about new songs that are being played through Pianobar. Ok, it&#8217;s not really THAT exciting, but still pretty cool. Let&#8217;s open up our text editors for one final edit. This time we&#8217;re opening the <code>/Users/yourusername/bin/pianobar-notify.rb</code> file. Ok, now that you&#8217;ve got your file open (welcome back, by the way), you&#8217;re going to type (or you can copy/paste if you really want to) this:</p>
+<div>
+  <pre>
+    <code class='ruby'>#!/usr/bin/ruby
+
+trigger = ARGV.shift
+
+if trigger == 'songstart'
+  songinfo = {}
+
+  STDIN.each_line { |line| songinfo.store(*line.chomp.split('=', 2))}
+  `growlnotify -t &quot;Now Playing&quot; -m &quot;#{songinfo['title']}\nby #{songinfo['artist']}&quot;`
+end</code>
+  </pre>
+</div>
+<p>Save the file, and you&#8217;re done. You can now listen to your favorite tunes through the command line, see who&#8217;s playing when new songs start, and you&#8217;re now up to speed with the latest in package management fashion for the Mac platform.</p>

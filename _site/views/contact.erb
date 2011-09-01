@@ -1,0 +1,31 @@
+<% @title = "Contact" %>
+<h2>Get In Touch</h2>
+<h3>Handy Form</h3>
+<form action="/contact" method="post">
+	<fieldset>
+		<label for="name">Name</label>
+		<input type="text" name="name" id="name" />
+		<span class="required">*</span>
+	</fieldset>
+	<fieldset>
+		<label for="email">E-Mail Address</label>
+		<input type="text" name="email" id="email" />
+		<span class="required">*</span>
+	</fieldset>
+	<fieldset>
+		<label for="url">Your URL</label>
+		<input type="text" name="url" id="url" />
+		<span class="required"></span>
+	</fieldset>
+	<fieldset>
+		<label for="message">Message</label>
+		<textarea name="message" id="message" rows="10"></textarea>
+		<span class="required">*</span>
+	</fieldset>
+	<fieldset>
+		<label for="spam">What color is an orange?</label>
+		<input type="text" name="spam" id="spam" />
+		<span class="required">*</span>
+	</fieldset>
+	<input type="image" src="images/submit.gif" />
+</form>

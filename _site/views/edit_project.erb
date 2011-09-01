@@ -1,0 +1,29 @@
+<% @title = "Admin" %>
+
+<h2>Admin</h2>
+<h3>Edit Project</h3>
+<form action="/edit_project" enctype="multipart/form-data" method="post">
+	<input type="hidden" name="id" value="<%=@project.id%>" />
+	<fieldset>
+		<label for="title">Title</label>
+		<input type="text" name="title" id="title" value="<%=@project.title%>" />
+	</fieldset>
+	<fieldset>
+		<label for="description">Description</label>
+		<textarea name="description" id="description" cols="40" rows="6"><%=@project.description%></textarea>
+	</fieldset>
+	<fieldset>
+		<label for="project_type">Type</label>
+		<select name="project_type" id="project_type">
+			<option <% if(@project.project_type=="Web") %>selected="yes" <% end %>>Web</option>
+			<option <% if(@project.project_type=="Print") %>selected="yes" <% end %>>Print</option>
+			<option <% if(@project.project_type=="Identity") %>selected="yes" <% end %>>Identity</option>
+			<option <% if(@project.project_type=="Render") %>selected="yes" <% end %>>Render</option>
+		</select>
+	</fieldset>
+	<fieldset>
+		<label for="url">URL</label>
+		<input type="text" name="url" id="url" value="<%=@project.url%>" />
+	</fieldset>
+	<input type="image" src="/images/submit.gif" value="Create" />
+</form>

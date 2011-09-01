@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="author" content="Lee Ourand" />
+		<title>HappyGastropod: Jacobi Iteration With Ruby</title>
+		<link rel="alternate" type="application/atom+xml" title="HappyGastropod.com" href="/atom.xml" />
+		<link rel="stylesheet" type="text/css" href="/resources/reset.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/main.css" />
+		<script src="/resources/site.js"></script>
+		<script type="text/javascript">
+		        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		        </script>
+		        <script type="text/javascript">
+		        try {
+		        var pageTracker = _gat._getTracker("UA-7743776-1");
+		        pageTracker._trackPageview();
+		        } catch(err) {}</script>
+		
+		<link rel="shortcut icon" href="/favicon.png" />
+	</head>
+	<body>
+		<header id="masthead">
+			<div>
+				<h1>HappyGastropod.com</h1>
+				<h2>Taking things one step at a time since 1986.</h2>
+				<nav>
+					<ul>
+						<li><a href="/pages/archive.html">Archive</a></li>
+						<li><a href="/pages/about.html">About Me</a></li>
+						<li><a href="/">Blog</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<section id="content">
+			<div>
+				<div class="post">
+	<h2>Jacobi Iteration With Ruby</h2>
+	<h3>Wed April 28 2010</h3>
+	<p>
+	When solving linear algebraic systems, it is often beneficial to use iterative methods. Iterative solvers are particularly useful when a matrix is diagonally dominant. One such iterative method that is particularly useful is Jacobi Iteration.
+</p>
+
+<p>
+	Given a matrix <em>A</em>, you first decompose it into 3 separate matrices: <em>L</em>, <em>D</em>, and <em>U</em>. These are the <em>lower</em>, <em>diagonal</em>, and <em>upper</em> sections of the matrix, respectively.<br /> 
+<img class="math" src="/assets/jacobi_decomposition.gif" alt="Jacobi Decomposition" />
+</p> 
+
+<p>
+	For example, let&#8217;s assume we&#8217;ve been given this matrix A:<br /> 
+<img class="math" src="/assets/jacobi_a_matrix.gif" alt="Example Matrix" />
+</p> 
+
+<p>
+	We will then zero-out everything above and including the diagonal entries. This will give us our new L matrix.<br /> 
+<img class="math" src="/assets/jacobi_l_matrix.gif" alt="Example L Matrix" />
+</p> 
+
+<p>Likewise, we&#8217;ll remove all entries below, and including the diagonal from matrix A to give us our matrix U. <br /> 
+<img class="math" src="/assets/jacobi_u_matrix.gif" alt="Example U Matrix" />
+</p>
+
+<p>Finally, we&#8217;ll zero-out all non-diagonal entries, to yield our new matrix D.<br /> 
+<img class="math" src="/assets/jacobi_d_matrix.gif" alt="Example D Matrix" />
+</p> 
+
+<p>
+	As stated previously, since <em>A=L+D+U</em>, we can deduce that <em>Ax=Dx+(L+U)x</em>. And since <em>Ax=b</em>, we can conclude that <em>Dx=b-(L+U)x</em>, which is the basis of Jacobi&#8217;s Method.
+</p> 
+
+<p>
+	Given an estimate vector (x) (which is generally initialized to 0 if no educated guess can be provided), the next estimate is found by:<br /> 
+<img class="math" src="/assets/jacobi_basis.gif" alt="Basic Jacobi Form" />
+</p> 
+
+<p>
+	And since <em>D</em> is a diagonal matrix, the above equation can be rewritten in terms of the components of <em>A</em> and <em>b</em>.<br /> 
+<img class="math" src="/assets/jacobi_complete.gif" alt="Jacobi Equation" /><br /> 
+<br style="clear: both;" /> 
+So now that we understand how Jacobi Iteration works, we can write a program to do it for us! Ruby is not necessarily the best language to do this in, as these systems can often times be quite large. Compiled languages such as C++ are going to converge much faster.</p> 
+<p>To start out, we&#8217;re going to write a method that takes in our Matrix <em>A</em>, our right hand size <em>b</em>, the number of times we&#8217;d like to iterate, and our initial guess.
+</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="k">def</span> <span class="nf">jacobi_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">guess</span> <span class="o">|=</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre>
+</div>
+
+
+<p>
+	From here, we will need to fire up our estimate vector <em>x</em>. We&#8217;ll initialize its first element to be the initial &#8220;guess,&#8221; and the remaining entries to be 0.
+</p> 
+
+<div class="highlight"><pre><code class="ruby">  <span class="c1"># Initialize</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="nb">Array</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+  <span class="n">x</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">guess</span>
+  <span class="mi">1</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+    <span class="n">x</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>
+	Finally, we implement the equation above as nested loops to iteratively try to converge to a solution.
+</p> 
+
+<div class="highlight"><pre><code class="ruby">  <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">iterations</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">its</span><span class="o">|</span>
+    <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+      <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">j</span><span class="o">|</span>
+        <span class="k">unless</span> <span class="n">j</span><span class="o">==</span><span class="n">i</span>
+          <span class="n">sum</span> <span class="o">=</span> <span class="n">A</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">j</span><span class="o">]</span> <span class="o">*</span> <span class="n">x</span><span class="o">[</span><span class="n">j</span><span class="o">]</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+      <span class="n">x</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="n">A</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">i</span><span class="o">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">-</span> <span class="n">sum</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>And there you have it! If you're doing this on large matrices, I would definitely suggest using a different language, such as C++ to handle this, since Ruby can not only be a bit slower, but it's also quite a memory hog when dealing with so many objects.</p>
+	<div id="disqus_thread">
+		<script type="text/javascript">
+  var disqus_developer = 1;
+  var disqus_shortname = 'happygastropod';
+  var disqus_identifier = '/2010/04/jacobi-iteration-with-ruby';
+	var disqus_url = "http://happygastropod.com/2010/04/jacobi-iteration-with-ruby";
+  var disqus_title = 'Jacobi Iteration With Ruby';
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+	</div>
+</div>
+			</div>
+		</section>
+		<footer id="foot">
+			<div id="recent-projects">
+				<h3>Recent Projects</h3>
+<ul>
+    <li><a href="http://happygastropod.com:4567">Jook</a></li>
+	<li><a href="http://github.com/thegastropod/peanut">Peanut</a></li>
+	<li><a href="http://slu.ug">slu.ug</a></li>
+	<li><a href="http://github.com/thegastropod/brightcms">bright cms</a></li>
+</ul>
+
+			</div>
+			<div id="recent-posts">
+				<h3>Recent Posts</h3>
+<ul>
+
+	<li><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></li>
+
+	<li><a href="/2011/03/a-centralized-boom-server-using-redis">A Centralized Boom Server Using Redis</a></li>
+
+	<li><a href="/2011/01/pianobar-on-mac-osx">Pianobar On Mac OS X</a></li>
+
+	<li><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></li>
+
+</ul>
+			</div>
+			<div id="friends">
+				<h3>Friends</h3>
+<ul>
+	<li><a href="http://notesfromnicole.com">Notes From Nicole</a></li>
+	<li><a href="http://chrisrhoden.com">Chris Rhoden</a></li>
+	<li><a href="http://erikimh.com">ErikIMH</a></li>
+	<li><a href="http://redkrieg.com">RedKrieg</a></li>
+	<li><a href="http://crspeedy.com">CRSpeedy</a></li>
+	<li><a href="http://metaskills.com">MetaSkills</a></li>
+</ul>
+			</div>				
+		</footer>
+	</body>
+</html>

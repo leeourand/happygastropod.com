@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN"
+	"http://www.w3.org/TR/xhtml1/DTD/khtml1-transitional.dtd">
+<html xmlns="http://w3.org/1999/khtml" lang="en" xml: lang="en">
+<head>
+	<title>HappyGastropod&mdash;<%=@title%></title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<link rel="stylesheet" href="/css/style.css" />
+	<script type="text/javascript" src="javascript/mootools.js"></script>
+	<script type="text/javascript" src="javascript/slimbox.js"></script>
+</head>
+<body>
+	<h1>HappyGastropod</h1>
+	<ul id="navigation">
+		<li id="nav_home" <% if(@title=="Home"); %>class="active" <% end %>><a href="/">Home</a></li>
+		<li id="nav_about" <% if(@title=="About"); %>class="active" <% end %>><a href="/about">About</a></li>
+		<li id="nav_work" <% if(@title=="Work"); %>class="active" <% end %>><a href="/work">Work</a></li>
+		<li id="nav_contact" <% if(@title=="Contact"); %>class="active" <% end %>><a href="/contact">Contact</a></li>
+	</ul>
+	<div id="wrapper">
+	<div id="content">
+		<% if(flash[:notice]) %>
+		<div class="notice"><%= flash[:notice] %></div>
+		<% end %>
+		<%= yield %>
+	</div>
+	<div id="footer">
+		<p>&copy; Copyright 2009 Lee Ourand</p>
+	</div>
+	</div><!--Wrapper-->
+	<div id="misc">
+		<%= partial("_#{@title}_sidebar".intern) %>
+	</div>
+</div>
+</body>
+</html>

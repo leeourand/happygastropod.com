@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="author" content="Lee Ourand" />
+		<title>HappyGastropod: Testing Nested Resources In Rails 3</title>
+		<link rel="alternate" type="application/atom+xml" title="HappyGastropod.com" href="/atom.xml" />
+		<link rel="stylesheet" type="text/css" href="/resources/reset.css" />
+		<link rel="stylesheet" type="text/css" href="/resources/main.css" />
+		<script src="/resources/site.js"></script>
+		<script type="text/javascript">
+		        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		        </script>
+		        <script type="text/javascript">
+		        try {
+		        var pageTracker = _gat._getTracker("UA-7743776-1");
+		        pageTracker._trackPageview();
+		        } catch(err) {}</script>
+		
+		<link rel="shortcut icon" href="/favicon.png" />
+	</head>
+	<body>
+		<header id="masthead">
+			<div>
+				<h1>HappyGastropod.com</h1>
+				<h2>Taking things one step at a time since 1986.</h2>
+				<nav>
+					<ul>
+						<li><a href="/pages/archive.html">Archive</a></li>
+						<li><a href="/pages/about.html">About Me</a></li>
+						<li><a href="/">Blog</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<section id="content">
+			<div>
+				<div class="post">
+	<h2>Testing Nested Resources In Rails 3</h2>
+	<h3>Thu October 21 2010</h3>
+	<p>
+	I recently ran into some problems when trying to run my functional tests while using nested resources in the new Rails 3. My routing was setup for nested resources, Foo has many Bars.
+</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">resources</span> <span class="ss">:foos</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:bars</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>
+	I used a rather contrived test to get started.
+</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="nb">test</span> <span class="s2">&quot;that I can GET the index&quot;</span> <span class="k">do</span>
+  <span class="n">get</span> <span class="ss">:index</span>
+  <span class="n">assert_response</span> <span class="ss">:success</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>The first error that I received, when using this fairly basic test was:</p>
+
+<code>NoMethodError: undefined method `recycle!` for #&lt;Bar:0x1033f09e0&gt;</code>
+
+<p>This error is easily corrected by renaming the fixture instance variable youre likely declaring in your setup. In my case, the Bar resource name needed to be updated.</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="n">setup</span> <span class="k">do</span>
+<span class="c1"># @bar = bars(:one) Change to:</span>
+  <span class="vi">@my_bar</span> <span class="o">=</span> <span class="n">bars</span><span class="p">(</span><span class="ss">:one</span><span class="p">)</span> 
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>ActionController has its own set of instance variables named after the controller. In the commented out case above, you are squashing Rails instance variable, which causes this error.</p>
+
+<p>After correcting this issue, I was still having problems.</p>
+
+<code>ActionController::RoutingError: No route matches {:controller=&gt;"bar"}</code>
+<p>This was another really basic fix that took me longer than I care to admit to resolve. To fix this, you simply need to fix your test case to provide the parent resource id.</p>
+
+<div class="highlight"><pre><code class="ruby"><span class="nb">test</span> <span class="s2">&quot;that I can GET the index&quot;</span> <span class="k">do</span>
+  <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="ss">:foo_id</span> <span class="o">=&gt;</span> <span class="vi">@my_foo</span><span class="o">.</span><span class="n">id</span>
+  <span class="n">assert_response</span> <span class="ss">:success</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+
+<p>Note that youll also need to declare a <code>@my_foo</code> variable in your setup for this to work. Otherwise, you can just use any number to get the routing to work. Happy testing!</p>
+	<div id="disqus_thread">
+		<script type="text/javascript">
+  var disqus_developer = 1;
+  var disqus_shortname = 'happygastropod';
+  var disqus_identifier = '/2010/10/testing-nested-resources-in-rails-3';
+	var disqus_url = "http://happygastropod.com/2010/10/testing-nested-resources-in-rails-3";
+  var disqus_title = 'Testing Nested Resources In Rails 3';
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+	</div>
+</div>
+			</div>
+		</section>
+		<footer id="foot">
+			<div id="recent-projects">
+				<h3>Recent Projects</h3>
+<ul>
+    <li><a href="http://happygastropod.com:4567">Jook</a></li>
+	<li><a href="http://github.com/thegastropod/peanut">Peanut</a></li>
+	<li><a href="http://slu.ug">slu.ug</a></li>
+	<li><a href="http://github.com/thegastropod/brightcms">bright cms</a></li>
+</ul>
+
+			</div>
+			<div id="recent-posts">
+				<h3>Recent Posts</h3>
+<ul>
+
+	<li><a href="/2011/07/july-cvreg-meetup">July CVREG Meetup</a></li>
+
+	<li><a href="/2011/03/a-centralized-boom-server-using-redis">A Centralized Boom Server Using Redis</a></li>
+
+	<li><a href="/2011/01/pianobar-on-mac-osx">Pianobar On Mac OS X</a></li>
+
+	<li><a href="/2010/10/testing-nested-resources-in-rails-3">Testing Nested Resources In Rails 3</a></li>
+
+</ul>
+			</div>
+			<div id="friends">
+				<h3>Friends</h3>
+<ul>
+	<li><a href="http://notesfromnicole.com">Notes From Nicole</a></li>
+	<li><a href="http://chrisrhoden.com">Chris Rhoden</a></li>
+	<li><a href="http://erikimh.com">ErikIMH</a></li>
+	<li><a href="http://redkrieg.com">RedKrieg</a></li>
+	<li><a href="http://crspeedy.com">CRSpeedy</a></li>
+	<li><a href="http://metaskills.com">MetaSkills</a></li>
+</ul>
+			</div>				
+		</footer>
+	</body>
+</html>
