@@ -120,6 +120,10 @@ nav ul li a {
 	}
 }
 
+ul li time {
+	float: right;
+}
+
 #content a {
 	&:link, &:visited {
 		color: lighten($red, 10%);
