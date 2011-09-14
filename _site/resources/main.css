@@ -86,6 +86,19 @@ nav ul li a {
   nav ul li a:hover {
     background-color: #bd3616; }
 
+ul#archive {
+  list-style: none; }
+
+ul#archive li {
+  border-top: 1px dashed #BBB;
+  padding: 5px; }
+
+ul#archive li time {
+  float: right;
+  text-align: left;
+  font-size: 0.8em;
+  color: #555; }
+
 #content a:link, #content a:visited {
   color: #bd3616; }
 #content a:hover {

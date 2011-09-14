@@ -120,8 +120,20 @@ nav ul li a {
 	}
 }
 
-ul li time {
+ul#archive {
+	list-style: none;
+}
+
+ul#archive li {
+	border-top: 1px dashed #BBB;
+	padding: 5px;
+}
+
+ul#archive li time {
 	float: right;
+	text-align: left;
+	font-size: 0.8em;
+	color: #555;
 }
 
 #content a {
